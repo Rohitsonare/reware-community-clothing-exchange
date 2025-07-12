@@ -556,11 +556,73 @@ const Dashboard = () => {
               </Box>
             </Grid>
             <Grid item>
-              <Button 
-                variant="contained" 
-                startIcon={<Edit />} 
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button 
+                  variant="outlined" 
+                  startIcon={<Search />} 
+                  onClick={() => navigate('/items')}
+                  sx={{ mr: 1 }}
+                >
+                  Browse Items
+                </Button>
+                <Button 
+                  variant="contained" 
+                  startIcon={<Edit />} 
+                  onClick={handleProfileEdit}
+                >
+                  Edit Profile
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </Paper>
+
+        {/* Quick Actions */}
+        <Paper elevation={2} sx={{ p: 3, mb: 4, borderRadius: 3 }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+            Quick Actions
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<Search />}
+                onClick={() => navigate('/items')}
+                sx={{ py: 1.5, borderRadius: 2 }}
+              >
+                Browse Items
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<Add />}
+                onClick={handleItemAdd}
+                sx={{ py: 1.5, borderRadius: 2 }}
+              >
+                Add New Item
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<SwapHoriz />}
+                onClick={() => setCurrentTab(1)}
+                sx={{ py: 1.5, borderRadius: 2 }}
+              >
+                View Swaps
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<AccountCircle />}
                 onClick={handleProfileEdit}
-                sx={{ mr: 2 }}
+                sx={{ py: 1.5, borderRadius: 2 }}
               >
                 Edit Profile
               </Button>
@@ -646,13 +708,22 @@ const Dashboard = () => {
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                   My Items ({dashboardData?.items?.length || 0})
                 </Typography>
-                <Button 
-                  variant="contained" 
-                  startIcon={<Add />} 
-                  onClick={handleItemAdd}
-                >
-                  Add New Item
-                </Button>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button 
+                    variant="outlined" 
+                    startIcon={<Search />} 
+                    onClick={() => navigate('/items')}
+                  >
+                    Browse Items
+                  </Button>
+                  <Button 
+                    variant="contained" 
+                    startIcon={<Add />} 
+                    onClick={handleItemAdd}
+                  >
+                    Add New Item
+                  </Button>
+                </Box>
               </Box>
               
               <Grid container spacing={3}>

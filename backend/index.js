@@ -4,6 +4,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import dashboardRoutes from './routes/dashboard.js';
+import itemsRoutes from './routes/items.js';
+import swapsRoutes from './routes/swaps.js';
 
 // Load environment variables
 dotenv.config();
@@ -40,6 +42,8 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/items', itemsRoutes);
+app.use('/api/swaps', swapsRoutes);
 
 // MongoDB connection with retry logic
 const connectDB = async () => {

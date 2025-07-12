@@ -4,11 +4,14 @@ import { ThemeProvider, createTheme } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { AuthProvider } from './contexts/AuthContext';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import Dashboard from './components/dashboard/Dashboard';
 import LandingPage from './components/LandingPage';
 import BrowseItems from './components/BrowseItems';
+import ItemListingPage from './components/ItemListingPage';
+import ItemDetailPage from './components/ItemDetailPage';
 import AuthService from './services/authService';
 
 const theme = createTheme({
@@ -87,46 +90,50 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Routes>
-          {/* Landing Page */}
-          <Route path="/" element={<LandingPage />} />
-          
-          {/* Browse Items */}
-          <Route path="/browse" element={<BrowseItems />} />
-          
-          {/* Public Routes */}
-          <Route 
-            path="/signin" 
-            element={
-              <PublicRoute>
-                <SignIn />
-              </PublicRoute>
-            } 
-          />
-          <Route 
-            path="/signup" 
-            element={
-              <PublicRoute>
-                <SignUp />
-              </PublicRoute>
-            } 
-          />
-          
-          {/* Protected Routes */}
-          <Route 
-            path="/dashboard" 
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            } 
-          />
-          
-          {/* Catch all route */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* Landing Page */}
+            <Route path="/" element={<LandingPage />} />
+            
+            {/* Browse Items */}
+            <Route path="/browse" element={<BrowseItems />} />
+            <Route path="/items" element={<ItemListingPage />} />
+            <Route path="/item/:id" element={<ItemDetailPage />} />
+            
+            {/* Public Routes */}
+            <Route 
+              path="/signin" 
+              element={
+                <PublicRoute>
+                  <SignIn />
+                </PublicRoute>
+              } 
+            />
+            <Route 
+              path="/signup" 
+              element={
+                <PublicRoute>
+                  <SignUp />
+                </PublicRoute>
+              } 
+            />
+            
+            {/* Protected Routes */}
+            <Route 
+              path="/dashboard" 
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              } 
+            />
+            
+            {/* Catch all route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
       <ToastContainer
         position="top-right"
         autoClose={5000}

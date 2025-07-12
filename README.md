@@ -1,13 +1,19 @@
 # ReWear - Community Clothing Exchange Platform
 
-A modern, full-stack web application for community-driven clothing exchange with beautiful UI/UX and social login integration.
+A modern, full-stack web application for community-driven clothing exchange with beautiful UI/UX, advanced item listing, and social login integration.
 
 ## 🚀 Features
 
 - **Beautiful, Modern UI**: Clean, responsive design with Material-UI components
+- **Advanced Item Listing**: Full-featured item browse with search, filters, and pagination
+- **Item Detail Pages**: Comprehensive item view with image gallery and interaction
 - **Social Authentication**: Google and Apple login integration
 - **Traditional Auth**: Email/password authentication with secure JWT tokens
-- **Points System**: Reward users for participating in clothing exchanges
+- **Like/Unlike System**: Users can like items and track favorites
+- **Swap Request System**: Request to swap items with other users
+- **Advanced Search & Filtering**: Search by title, filter by category, size, condition, availability
+- **Responsive Design**: Grid/list view toggle, mobile-friendly interface
+- **Real-time Updates**: Live item availability and interaction feedback
 - **Secure Backend**: Express.js with MongoDB and Firebase authentication
 - **Modern Frontend**: React with modern hooks and animations
 - **Separated Architecture**: Clean separation between frontend and backend
@@ -21,6 +27,7 @@ A modern, full-stack web application for community-driven clothing exchange with
 - Firebase Auth for social login
 - React Router for navigation
 - Axios for API calls
+- Lodash for utility functions
 
 ### Backend
 - Node.js & Express.js
@@ -28,6 +35,7 @@ A modern, full-stack web application for community-driven clothing exchange with
 - Firebase Admin SDK
 - JWT for authentication
 - bcryptjs for password hashing
+- Comprehensive API endpoints for items, users, and swaps
 
 ## 📁 Project Structure
 
@@ -38,21 +46,45 @@ reware-communtiy-clothing-exchange/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── auth/         # Authentication components
-│   │   │   └── dashboard/    # Dashboard components
+│   │   │   ├── dashboard/    # Dashboard components
+│   │   │   ├── ItemListingPage.js    # Main item listing page
+│   │   │   ├── ItemDetailPage.js     # Item detail view
+│   │   │   ├── BrowseItems.js        # Browse items component
+│   │   │   └── LandingPage.js        # Landing page
+│   │   ├── contexts/         # React contexts (Auth)
 │   │   ├── services/         # API services
 │   │   └── firebase.js       # Firebase configuration
 │   ├── package.json
 │   └── .env                  # Frontend environment variables
 ├── backend/                  # Express.js backend
-│   ├── models/               # MongoDB models
-│   ├── routes/               # API routes
+│   ├── models/               # MongoDB models (User, Item, Swap)
+│   ├── routes/               # API routes (auth, dashboard, items)
+│   ├── seed.js               # Database seeding script
 │   ├── package.json
 │   └── .env                  # Backend environment variables
+├── test-app.sh               # API testing script
 ├── package.json              # Root package.json for scripts
 └── README.md
 ```
 
 ## 🎨 UI/UX Features
+
+### Item Listing Page
+- **Advanced Search**: Real-time search by item title and description
+- **Smart Filtering**: Filter by category, size, condition, and availability
+- **Flexible Views**: Toggle between grid and list view layouts
+- **Responsive Design**: Optimized for desktop, tablet, and mobile
+- **Pagination**: Efficient browsing with page-based navigation
+- **Category Statistics**: Visual breakdown of items by category
+- **Like/Unlike**: Heart button to save favorite items
+- **Swap Requests**: Direct swap request functionality
+
+### Item Detail Page
+- **Image Gallery**: High-quality image display with navigation
+- **Comprehensive Details**: Full item information including owner details
+- **Interactive Actions**: Like, unlike, and swap request buttons
+- **Owner Information**: Profile pictures and user details
+- **Responsive Layout**: Mobile-friendly detail view
 
 ### Enhanced Sign-In Page
 - Beautiful gradient header cards
@@ -121,17 +153,51 @@ FIREBASE_CLIENT_EMAIL=your_service_account_email
 FIREBASE_PRIVATE_KEY=your_private_key
 ```
 
-### 5. Start MongoDB
+#### Frontend (.env)
+```env
+REACT_APP_FIREBASE_API_KEY=your_api_key_here
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+REACT_APP_FIREBASE_APP_ID=your_app_id
+REACT_APP_BACKEND_URL=http://localhost:5001
+```
+
+### 5. Seed the Database (Optional)
+```bash
+cd backend
+npm run seed
+```
+This will populate your database with sample users and items for testing.
+
+### 6. Start MongoDB
 ```bash
 mongod
 ```
 
-### 6. Run the Application
+### 7. Run the Application
 ```bash
 npm run dev
 ```
 
 This will start both frontend (http://localhost:3000) and backend (http://localhost:5001) concurrently.
+
+## 🧪 Testing
+
+### API Testing
+Run the comprehensive API test script:
+```bash
+chmod +x test-app.sh
+./test-app.sh
+```
+
+This script tests all major API endpoints including:
+- Item listing and filtering
+- Search functionality
+- Like/unlike operations
+- Category statistics
+- Pagination
 
 ## 🔐 Authentication Flow
 
@@ -149,6 +215,27 @@ This will start both frontend (http://localhost:3000) and backend (http://localh
 5. JWT token is issued for app access
 
 ## 🌟 Key Features Implemented
+
+### Item Listing & Management
+- ✅ Advanced item listing page with search and filters
+- ✅ Item detail pages with image galleries
+- ✅ Like/unlike functionality for items
+- ✅ Swap request system
+- ✅ Category-based filtering and statistics
+- ✅ Size and condition filtering
+- ✅ Availability status tracking
+- ✅ Pagination for large item lists
+- ✅ Grid and list view options
+- ✅ Responsive design for all devices
+
+### Backend API
+- ✅ Comprehensive item API with filtering
+- ✅ Search functionality across title and description
+- ✅ Like/unlike endpoints
+- ✅ Category statistics endpoint
+- ✅ Pagination support
+- ✅ User authentication integration
+- ✅ Error handling and validation
 
 ### Enhanced UI/UX
 - ✅ Beautiful gradient headers
@@ -172,7 +259,33 @@ This will start both frontend (http://localhost:3000) and backend (http://localh
 - ✅ Environment configuration
 - ✅ Build and development scripts
 
-## 🚀 Available Scripts
+### Data Management
+- ✅ MongoDB integration with Mongoose
+- ✅ Database seeding script
+- ✅ Comprehensive data models
+- ✅ Test data generation
+
+## � API Endpoints
+
+### Items API
+- `GET /api/items` - Get all items with filtering and pagination
+  - Query params: `page`, `limit`, `search`, `category`, `size`, `condition`, `isAvailable`
+- `GET /api/items/stats` - Get category statistics
+- `GET /api/items/:id` - Get specific item details
+- `POST /api/items/:id/like` - Like an item (requires authentication)
+- `DELETE /api/items/:id/like` - Unlike an item (requires authentication)
+- `POST /api/items/:id/swap` - Request a swap (requires authentication)
+
+### Authentication API
+- `POST /api/auth/signup` - User registration
+- `POST /api/auth/signin` - User login
+- `POST /api/auth/google` - Google OAuth login
+- `POST /api/auth/apple` - Apple OAuth login
+
+### Dashboard API
+- `GET /api/dashboard` - Get user dashboard data (requires authentication)
+
+## �🚀 Available Scripts
 
 ### Root Level
 - `npm run dev` - Start both frontend and backend
@@ -189,15 +302,20 @@ This will start both frontend (http://localhost:3000) and backend (http://localh
 ### Backend
 - `npm run dev` - Start with nodemon
 - `npm start` - Start production server
+- `npm run seed` - Seed database with test data
 
 ## 🎯 Future Enhancements
 
-- Clothing item management
-- User profiles and ratings
-- Messaging system
-- Exchange history
-- Admin dashboard
+- Advanced messaging system between users
+- User profiles and ratings system
+- Exchange history and tracking
+- Admin dashboard for moderation
 - Mobile app (React Native)
+- Push notifications
+- Image upload and management
+- Advanced recommendation system
+- Geolocation-based filtering
+- Multi-language support
 
 ## 📄 License
 
@@ -217,24 +335,4 @@ For support, please open an issue in the GitHub repository or contact the develo
 
 ---
 
-Built with ❤️ using React, Node.js, and Firebase
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Built with ❤️ using React, Node.js, MongoDB, and Firebase
