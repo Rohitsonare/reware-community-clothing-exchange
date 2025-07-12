@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(user));
         return { success: true, user };
       } else {
-        return { success: false, error: data.error || 'Login failed' };
+        return { success: false, error: data.message || data.error || 'Login failed' };
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(user));
         return { success: true, user };
       } else {
-        return { success: false, error: data.error || 'Registration failed' };
+        return { success: false, error: data.message || data.error || 'Registration failed' };
       }
     } catch (error) {
       console.error('Registration error:', error);

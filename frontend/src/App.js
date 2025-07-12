@@ -13,6 +13,7 @@ import BrowseItems from './components/BrowseItems';
 import ItemListingPage from './components/ItemListingPage';
 import ItemDetailPage from './components/ItemDetailPage';
 import AddItemPage from './components/AddItemPage';
+import AuthDebugPage from './components/AuthDebugPage';
 
 const theme = createTheme({
   palette: {
@@ -104,6 +105,9 @@ const AppRoutes = () => {
     <Routes>
       {/* Landing Page */}
       <Route path="/" element={<LandingPage />} />
+      
+      {/* Debug Route */}
+      <Route path="/debug" element={<AuthDebugPage />} />
       
       {/* Browse Items */}
       <Route path="/browse" element={<BrowseItems />} />

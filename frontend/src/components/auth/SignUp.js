@@ -28,10 +28,12 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../contexts/AuthContext';
 import AuthService from '../../services/authService';
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -91,16 +93,22 @@ const SignUp = () => {
       // First test API connection
       await AuthService.testConnection();
       
-      // Then attempt signup
+      // Then attempt signup using AuthContext
       const userData = {
         name: formData.name,
         email: formData.email,
         password: formData.password,
       };
       
-      const response = await AuthService.signup(userData);
-      toast.success(`Welcome to ReWear, ${response.user.name}! Your account has been created.`);
-      navigate('/dashboard');
+      const result = await register(userData);
+      
+      if (result.success) {
+        toast.success(`Welcome to ReWear, ${result.user.name}! Your account has been created.`);
+        navigate('/dashboard');
+      } else {
+        setError(result.error || 'Sign up failed');
+        toast.error('Sign up failed');
+      }
     } catch (error) {
       console.error('Sign up error:', error);
       setError(error.response?.data?.message || 'Failed to connect to the server. Please try again.');

@@ -27,10 +27,12 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../contexts/AuthContext';
 import AuthService from '../../services/authService';
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -58,10 +60,16 @@ const SignIn = () => {
       // First test API connection
       await AuthService.testConnection();
       
-      // Then attempt sign in
-      const response = await AuthService.signin(formData);
-      toast.success(`Welcome back, ${response.user.name}!`);
-      navigate('/dashboard');
+      // Then attempt sign in using AuthContext
+      const result = await login(formData.email, formData.password);
+      
+      if (result.success) {
+        toast.success(`Welcome back, ${result.user.name}!`);
+        navigate('/dashboard');
+      } else {
+        setError(result.error || 'Sign in failed');
+        toast.error('Sign in failed');
+      }
     } catch (error) {
       console.error('Sign in error:', error);
       setError(error.response?.data?.message || 'Failed to connect to the server. Please try again.');
