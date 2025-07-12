@@ -158,7 +158,64 @@ function App() {
       <CssBaseline />
       <AuthProvider>
         <Router>
-          <AppRoutes />
+          <Routes>
+            {/* Landing Page */}
+            <Route path="/" element={<LandingPage />} />
+            
+            {/* Browse Items */}
+            <Route path="/browse" element={<BrowseItems />} />
+            <Route path="/items" element={<ItemListingPage />} />
+            <Route path="/item/:id" element={<ItemDetailPage />} />
+            
+            {/* Protected Routes */}
+            <Route 
+              path="/dashboard" 
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/add-item" 
+              element={
+                <PrivateRoute>
+                  <AddItemPage />
+                </PrivateRoute>
+              } 
+            />
+            
+            {/* Public Routes */}
+            <Route 
+              path="/signin" 
+              element={
+                <PublicRoute>
+                  <SignIn />
+                </PublicRoute>
+              } 
+            />
+            <Route 
+              path="/signup" 
+              element={
+                <PublicRoute>
+                  <SignUp />
+                </PublicRoute>
+              } 
+            />
+            
+            {/* Protected Routes */}
+            <Route 
+              path="/dashboard" 
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              } 
+            />
+            
+            {/* Catch all route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </Router>
       </AuthProvider>
       <ToastContainer

@@ -60,7 +60,7 @@ const connectDB = async () => {
 
 // Connect to MongoDB and start server
 connectDB().then(() => {
-  const port = process.env.PORT || 5000;
+  const port = process.env.PORT || 3001;
   app.listen(port, () => {
     console.log(`🚀 Server is running on port ${port}`);
     console.log(`🔗 API available at http://localhost:${port}/api`);

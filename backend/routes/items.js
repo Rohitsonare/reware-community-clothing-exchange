@@ -2,11 +2,12 @@ import express from 'express';
 import Item from '../models/Item.js';
 import User from '../models/User.js';
 import mongoose from 'mongoose';
+import { authenticateToken, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // Create a new item
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
     const {
       title,
@@ -19,21 +20,17 @@ router.post('/', async (req, res) => {
       pointsValue,
       images,
       tags,
-      userId,
       location
     } = req.body;
 
-    // Validate required fields
-    if (!title || !description || !category || !size || !condition || !pointsValue || !userId) {
-      return res.status(400).json({ 
-        error: 'Missing required fields: title, description, category, size, condition, pointsValue, userId' 
-      });
-    }
+    // Get user from authenticated token
+    const userId = req.user._id;
 
-    // Validate user exists
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+    // Validate required fields
+    if (!title || !description || !category || !size || !condition || !pointsValue || !color) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: title, description, category, size, condition, pointsValue, color' 
+      });
     }
 
     // Validate points value
@@ -53,13 +50,17 @@ router.post('/', async (req, res) => {
       category,
       size,
       condition,
-      color: color?.trim() || '',
+      color: color?.trim() || 'Not specified',
       brand: brand?.trim() || '',
       pointsValue: parseInt(pointsValue),
       images,
       tags: tags || [],
       userId,
-      location: location || user.location || { city: 'Unknown', state: 'Unknown', country: 'USA' },
+      location: location || {
+        city: req.user.location?.city || 'Not specified',
+        state: req.user.location?.state || 'Not specified',
+        country: req.user.location?.country || 'USA'
+      },
       views: 0,
       likes: [],
       isAvailable: true
