@@ -1,26 +1,74 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import Dashboard from './components/dashboard/Dashboard';
+import LandingPage from './components/LandingPage';
+import BrowseItems from './components/BrowseItems';
 import AuthService from './services/authService';
 
 const theme = createTheme({
   palette: {
     primary: {
       main: '#2E7D32', // Green color for sustainability theme
+      light: '#4CAF50',
+      dark: '#1B5E20',
     },
     secondary: {
       main: '#757575',
+      light: '#9E9E9E',
+      dark: '#424242',
+    },
+    success: {
+      main: '#4CAF50',
+    },
+    background: {
+      default: '#fafafa',
+      paper: '#ffffff',
     },
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     button: {
       textTransform: 'none',
+    },
+    h1: {
+      fontWeight: 700,
+    },
+    h2: {
+      fontWeight: 600,
+    },
+    h3: {
+      fontWeight: 600,
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          fontWeight: 500,
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        },
+      },
     },
   },
 });
@@ -38,8 +86,15 @@ const PublicRoute = ({ children }) => {
 function App() {
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Router>
         <Routes>
+          {/* Landing Page */}
+          <Route path="/" element={<LandingPage />} />
+          
+          {/* Browse Items */}
+          <Route path="/browse" element={<BrowseItems />} />
+          
           {/* Public Routes */}
           <Route 
             path="/signin" 
@@ -68,9 +123,8 @@ function App() {
             } 
           />
           
-          {/* Redirect Routes */}
-          <Route path="/" element={<Navigate to={AuthService.isAuthenticated() ? "/dashboard" : "/signin"} />} />
-          <Route path="*" element={<Navigate to="/" />} />
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
       <ToastContainer
