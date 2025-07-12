@@ -4,7 +4,7 @@ import { auth, googleProvider, appleProvider } from '../firebase';
 
 // Create axios instance with default config
 const API = axios.create({
-  baseURL: 'http://localhost:5001/api',
+  baseURL: `${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api`,
   headers: {
     'Content-Type': 'application/json',
   }

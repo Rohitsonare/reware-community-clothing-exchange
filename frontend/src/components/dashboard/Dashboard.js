@@ -134,7 +134,9 @@ const Dashboard = () => {
       try {
         const data = await dashboardService.getDashboardData(currentUser.id);
         setDashboardData(data);
+        console.log('Dashboard data loaded successfully:', data);
       } catch (apiError) {
+        console.error('Dashboard API error:', apiError);
         console.log('API not available, using mock data');
         setDashboardData(getMockDashboardData(currentUser));
       }
@@ -287,20 +289,7 @@ const Dashboard = () => {
   };
 
   const handleItemAdd = () => {
-    setSelectedItem(null);
-    setItemForm({
-      title: '',
-      description: '',
-      category: '',
-      size: '',
-      condition: '',
-      brand: '',
-      color: '',
-      pointsValue: 10,
-      location: { city: '', state: '', country: 'USA' },
-      tags: ''
-    });
-    setItemDialog(true);
+    navigate('/add-item');
   };
 
   const handleItemEdit = (item) => {

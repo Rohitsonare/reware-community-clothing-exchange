@@ -12,6 +12,7 @@ import LandingPage from './components/LandingPage';
 import BrowseItems from './components/BrowseItems';
 import ItemListingPage from './components/ItemListingPage';
 import ItemDetailPage from './components/ItemDetailPage';
+import AddItemPage from './components/AddItemPage';
 import AuthService from './services/authService';
 
 const theme = createTheme({
@@ -100,6 +101,24 @@ function App() {
             <Route path="/browse" element={<BrowseItems />} />
             <Route path="/items" element={<ItemListingPage />} />
             <Route path="/item/:id" element={<ItemDetailPage />} />
+            
+            {/* Protected Routes */}
+            <Route 
+              path="/dashboard" 
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/add-item" 
+              element={
+                <PrivateRoute>
+                  <AddItemPage />
+                </PrivateRoute>
+              } 
+            />
             
             {/* Public Routes */}
             <Route 

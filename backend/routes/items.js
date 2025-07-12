@@ -5,6 +5,88 @@ import mongoose from 'mongoose';
 
 const router = express.Router();
 
+// Create a new item
+router.post('/', async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      category,
+      size,
+      condition,
+      color,
+      brand,
+      pointsValue,
+      images,
+      tags,
+      userId,
+      location
+    } = req.body;
+
+    // Validate required fields
+    if (!title || !description || !category || !size || !condition || !pointsValue || !userId) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: title, description, category, size, condition, pointsValue, userId' 
+      });
+    }
+
+    // Validate user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Validate points value
+    if (pointsValue <= 0 || pointsValue > 1000) {
+      return res.status(400).json({ error: 'Points value must be between 1 and 1000' });
+    }
+
+    // Validate images
+    if (!images || images.length === 0) {
+      return res.status(400).json({ error: 'At least one image is required' });
+    }
+
+    // Create new item
+    const newItem = new Item({
+      title: title.trim(),
+      description: description.trim(),
+      category,
+      size,
+      condition,
+      color: color?.trim() || '',
+      brand: brand?.trim() || '',
+      pointsValue: parseInt(pointsValue),
+      images,
+      tags: tags || [],
+      userId,
+      location: location || user.location || { city: 'Unknown', state: 'Unknown', country: 'USA' },
+      views: 0,
+      likes: [],
+      isAvailable: true
+    });
+
+    const savedItem = await newItem.save();
+    
+    // Update user's item count
+    await User.findByIdAndUpdate(userId, { 
+      $inc: { 'stats.itemsListed': 1 } 
+    });
+
+    // Populate user data for response
+    const populatedItem = await Item.findById(savedItem._id)
+      .populate('userId', 'name email location stats avatar');
+
+    res.status(201).json({
+      message: 'Item created successfully',
+      item: populatedItem
+    });
+
+  } catch (error) {
+    console.error('Error creating item:', error);
+    res.status(500).json({ error: 'Failed to create item' });
+  }
+});
+
 // Get all items with filtering, sorting, and pagination
 router.get('/', async (req, res) => {
   try {
