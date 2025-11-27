@@ -11,7 +11,6 @@ import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import Dashboard from './components/dashboard/Dashboard';
 import LandingPage from './components/LandingPage';
-import BrowseItems from './components/BrowseItems';
 import ItemListingPage from './components/ItemListingPage';
 import ItemDetailPage from './components/ItemDetailPage';
 import AddItemPage from './components/AddItemPage';
