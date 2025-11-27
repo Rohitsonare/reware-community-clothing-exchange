@@ -27,19 +27,9 @@ import {
   AppBar,
   Toolbar,
   Drawer,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Divider,
-  Badge,
   Fab,
   Autocomplete,
-  Slider,
   CardActions,
-  Menu,
-  Fade,
-  Backdrop,
   CircularProgress,
   Alert,
   Snackbar
@@ -51,34 +41,23 @@ import {
   ViewList,
   Favorite,
   FavoriteBorder,
-  Share,
   LocationOn,
-  Star,
   Visibility,
   SwapHoriz,
   Close,
   ArrowBack,
-  SortByAlpha,
-  AccessTime,
-  TrendingUp,
-  Category,
-  Home,
   AccountCircle,
-  Settings,
-  ShoppingCart,
   Checkroom,
-  LocalOffer,
   Refresh,
   Add
 } from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ApiService from '../services/apiService';
 import { debounce } from 'lodash';
 
 const ItemListingPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useAuth();
 
   // State management
@@ -106,13 +85,12 @@ const ItemListingPage = () => {
   });
   const [viewMode, setViewMode] = useState('grid');
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [itemDetailOpen, setItemDetailOpen] = useState(false);
   const [swapRequestOpen, setSwapRequestOpen] = useState(false);
   const [swapRequestItem, setSwapRequestItem] = useState(null);
-  const [filterCounts, setFilterCounts] = useState({});
   const [likedItems, setLikedItems] = useState(new Set());
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [imageErrors, setImageErrors] = useState(new Set());
+  const [imageLoading, setImageLoading] = useState(new Set());
 
   // Constants
   const categories = ['all', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Footwear', 'Accessories', 'Other'];
@@ -163,7 +141,10 @@ const ItemListingPage = () => {
       
       setItems(data.items);
       setPagination(data.pagination);
-      setFilterCounts(data.filters);
+      
+      // Reset image states for new items
+      setImageErrors(new Set());
+      setImageLoading(new Set());
       
       // Track liked items
       const userLikedItems = new Set();
@@ -209,16 +190,8 @@ const ItemListingPage = () => {
   };
 
   const handleItemClick = async (item) => {
-    setSelectedItem(item);
-    setItemDetailOpen(true);
-    
-    // Fetch detailed item data
-    try {
-      const response = await ApiService.get(`/api/items/${item._id}`);
-      setSelectedItem(response.item);
-    } catch (error) {
-      console.error('Error fetching item details:', error);
-    }
+    // Future implementation for item detail view
+    console.log('Item clicked:', item);
   };
 
   const handleLikeToggle = async (itemId, event) => {
@@ -320,199 +293,289 @@ const ItemListingPage = () => {
     }
   };
 
-  const renderItemCard = (item) => (
-    <Card 
-      key={item._id}
-      sx={{ 
-        height: '100%', 
-        display: 'flex', 
-        flexDirection: 'column',
-        cursor: 'pointer',
-        transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: (theme) => theme.shadows[8]
-        }
-      }}
-      onClick={() => handleItemClick(item)}
-    >
-      <Box sx={{ position: 'relative' }}>
-        <CardMedia
-          component="img"
-          height="200"
-          image={item.images?.[0] || 'https://via.placeholder.com/300x200/f5f5f5/999?text=No+Image'}
-          alt={item.title}
-          sx={{ 
-            objectFit: 'cover',
-            backgroundColor: 'grey.100'
-          }}
-        />
-        <Box sx={{ 
-          position: 'absolute', 
-          top: 8, 
-          right: 8,
-          display: 'flex',
+  const renderItemCard = (item) => {
+    const hasImageError = imageErrors.has(item._id);
+    const isImageLoading = imageLoading.has(item._id);
+
+    const handleImageError = () => {
+      setImageErrors(prev => new Set([...prev, item._id]));
+      setImageLoading(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(item._id);
+        return newSet;
+      });
+    };
+
+    const handleImageLoad = () => {
+      setImageLoading(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(item._id);
+        return newSet;
+      });
+    };
+
+    const handleImageStart = () => {
+      setImageLoading(prev => new Set([...prev, item._id]));
+    };
+
+    return (
+      <Card 
+        key={item._id}
+        sx={{ 
+          height: '100%', 
+          display: 'flex', 
           flexDirection: 'column',
-          gap: 1
-        }}>
-          <IconButton
-            size="small"
-            onClick={(e) => handleLikeToggle(item._id, e)}
-            sx={{ 
-              bgcolor: 'rgba(255, 255, 255, 0.9)',
-              '&:hover': { bgcolor: 'rgba(255, 255, 255, 1)' }
-            }}
-          >
-            {likedItems.has(item._id) ? 
-              <Favorite sx={{ color: 'red' }} /> : 
-              <FavoriteBorder />
-            }
-          </IconButton>
-          <Chip
-            label={`${item.pointsValue} pts`}
-            size="small"
-            color="success"
-            sx={{ 
-              bgcolor: 'rgba(76, 175, 80, 0.9)',
-              color: 'white',
-              fontWeight: 'bold'
-            }}
-          />
+          cursor: 'pointer',
+          transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+          borderRadius: 2,
+          overflow: 'hidden',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: (theme) => theme.shadows[8]
+          }
+        }}
+        onClick={() => handleItemClick(item)}
+      >
+        <Box sx={{ position: 'relative', height: 240 }}>
+          {/* Image Loading Skeleton */}
+          {isImageLoading && (
+            <Box sx={{ 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              bgcolor: 'grey.100',
+              zIndex: 1
+            }}>
+              <CircularProgress size={24} />
+            </Box>
+          )}
+          
+          {/* Main Image */}
+          {!hasImageError && item.images && item.images.length > 0 ? (
+            <CardMedia
+              component="img"
+              height="240"
+              image={item.images[0]}
+              alt={item.title}
+              onError={handleImageError}
+              onLoad={handleImageLoad}
+              onLoadStart={handleImageStart}
+              sx={{ 
+                objectFit: 'cover',
+                backgroundColor: 'grey.100',
+                display: isImageLoading ? 'none' : 'block'
+              }}
+            />
+          ) : (
+            <Box sx={{ 
+              height: '240px', 
+              backgroundColor: 'grey.100',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column'
+            }}>
+              <Checkroom sx={{ fontSize: 48, color: 'grey.400', mb: 1 }} />
+              <Typography variant="body2" color="grey.400">
+                No Image Available
+              </Typography>
+            </Box>
+          )}
+
+          {/* Overlay Gradient */}
+          <Box sx={{ 
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '50%',
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), transparent)',
+            pointerEvents: 'none'
+          }} />
+          
+          {/* Action Buttons */}
+          <Box sx={{ 
+            position: 'absolute', 
+            top: 8, 
+            right: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1
+          }}>
+            <IconButton
+              size="small"
+              onClick={(e) => handleLikeToggle(item._id, e)}
+              sx={{ 
+                bgcolor: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(4px)',
+                '&:hover': { bgcolor: 'rgba(255, 255, 255, 1)' }
+              }}
+            >
+              {likedItems.has(item._id) ? 
+                <Favorite sx={{ color: 'red' }} /> : 
+                <FavoriteBorder />
+              }
+            </IconButton>
+            <Chip
+              label={`${item.pointsValue} pts`}
+              size="small"
+              sx={{ 
+                bgcolor: 'rgba(76, 175, 80, 0.95)',
+                color: 'white',
+                fontWeight: 'bold',
+                backdropFilter: 'blur(4px)'
+              }}
+            />
+          </Box>
+          
+          {/* Status Chips */}
+          <Box sx={{ 
+            position: 'absolute', 
+            bottom: 8, 
+            left: 8,
+            display: 'flex',
+            gap: 1,
+            flexWrap: 'wrap'
+          }}>
+            <Chip
+              label={item.condition}
+              size="small"
+              color={getConditionColor(item.condition)}
+              sx={{ 
+                bgcolor: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(4px)'
+              }}
+            />
+            <Chip
+              label={item.isAvailable ? 'Available' : 'Unavailable'}
+              size="small"
+              color={item.isAvailable ? 'success' : 'warning'}
+              sx={{ 
+                bgcolor: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(4px)'
+              }}
+            />
+          </Box>
         </Box>
-        <Box sx={{ 
-          position: 'absolute', 
-          bottom: 8, 
-          left: 8,
-          display: 'flex',
-          gap: 1
-        }}>
-          <Chip
-            label={item.condition}
-            size="small"
-            color={getConditionColor(item.condition)}
-            sx={{ bgcolor: 'rgba(255, 255, 255, 0.9)' }}
-          />
-          <Chip
-            label={item.isAvailable ? 'Available' : 'Unavailable'}
-            size="small"
-            color={item.isAvailable ? 'success' : 'warning'}
-            sx={{ bgcolor: 'rgba(255, 255, 255, 0.9)' }}
-          />
-        </Box>
-      </Box>
-      
-      <CardContent sx={{ flexGrow: 1, pb: 1, px: 2, pt: 2 }}>
-        <Typography variant="h6" component="h2" noWrap gutterBottom sx={{ fontSize: '1.1rem' }}>
-          {item.title}
-        </Typography>
         
-        {/* Item details in a compact format */}
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
-          <Chip 
-            label={item.category} 
-            size="small" 
-            variant="outlined" 
-            sx={{ fontSize: '0.7rem', height: '20px' }}
-          />
-          <Chip 
-            label={`Size ${item.size}`} 
-            size="small" 
-            variant="outlined" 
-            sx={{ fontSize: '0.7rem', height: '20px' }}
-          />
-          {item.brand && (
+        <CardContent sx={{ flexGrow: 1, pb: 1, px: 2, pt: 2 }}>
+          <Typography variant="h6" component="h2" noWrap gutterBottom sx={{ fontSize: '1.1rem' }}>
+            {item.title}
+          </Typography>
+          
+          {/* Item details in a compact format */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
             <Chip 
-              label={item.brand} 
+              label={item.category} 
               size="small" 
               variant="outlined" 
               sx={{ fontSize: '0.7rem', height: '20px' }}
             />
-          )}
-        </Box>
-        
-        <Typography 
-          variant="body2" 
-          color="text.secondary" 
-          sx={{ 
-            mb: 1.5,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            minHeight: '2.5em',
-            fontSize: '0.85rem'
-          }}
-        >
-          {item.description}
-        </Typography>
-        
-        {/* User info */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-          <Avatar 
-            sx={{ width: 20, height: 20 }}
-            src={item.userId?.avatar}
-          >
-            {item.userId?.name?.charAt(0)}
-          </Avatar>
-          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-            {item.userId?.name}
-          </Typography>
-        </Box>
-        
-        {/* Location */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-          <LocationOn sx={{ fontSize: 14, color: 'text.secondary' }} />
-          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-            {item.location?.city}, {item.location?.state}
-          </Typography>
-        </Box>
-        
-        {/* Stats */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', gap: 0.5 }}>
             <Chip 
-              icon={<Visibility />} 
-              label={item.views} 
+              label={`Size ${item.size}`} 
               size="small" 
-              variant="outlined"
-              sx={{ fontSize: '0.65rem', height: '18px' }}
+              variant="outlined" 
+              sx={{ fontSize: '0.7rem', height: '20px' }}
             />
-            <Chip 
-              icon={<Favorite />} 
-              label={item.likes?.length || 0} 
-              size="small" 
-              variant="outlined"
-              sx={{ fontSize: '0.65rem', height: '18px' }}
-            />
+            {item.brand && (
+              <Chip 
+                label={item.brand} 
+                size="small" 
+                variant="outlined" 
+                sx={{ fontSize: '0.7rem', height: '20px' }}
+              />
+            )}
           </Box>
-          {item.tags && item.tags.length > 0 && (
-            <Chip
-              label={item.tags[0]}
-              size="small"
-              variant="outlined"
-              sx={{ fontSize: '0.65rem', height: '18px' }}
-            />
-          )}
-        </Box>
-      </CardContent>
-      
-      <CardActions sx={{ pt: 0, px: 2, pb: 2 }}>
-        <Button
-          fullWidth
-          variant="contained"
-          startIcon={<SwapHoriz />}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleSwapRequest(item);
-          }}
-          disabled={!item.isAvailable}
-          sx={{ borderRadius: 2 }}
-        >
-          {item.isAvailable ? 'Request Swap' : 'Unavailable'}
-        </Button>
-      </CardActions>
-    </Card>
-  );
+          
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            sx={{ 
+              mb: 1.5,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              minHeight: '2.5em',
+              fontSize: '0.85rem'
+            }}
+          >
+            {item.description}
+          </Typography>
+          
+          {/* User info */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <Avatar 
+              sx={{ width: 20, height: 20 }}
+              src={item.userId?.avatar}
+            >
+              {item.userId?.name?.charAt(0)}
+            </Avatar>
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+              {item.userId?.name}
+            </Typography>
+          </Box>
+          
+          {/* Location */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <LocationOn sx={{ fontSize: 14, color: 'text.secondary' }} />
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+              {item.location?.city}, {item.location?.state}
+            </Typography>
+          </Box>
+          
+          {/* Stats */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 0.5 }}>
+              <Chip 
+                icon={<Visibility />} 
+                label={item.views} 
+                size="small" 
+                variant="outlined"
+                sx={{ fontSize: '0.65rem', height: '18px' }}
+              />
+              <Chip 
+                icon={<Favorite />} 
+                label={item.likes?.length || 0} 
+                size="small" 
+                variant="outlined"
+                sx={{ fontSize: '0.65rem', height: '18px' }}
+              />
+            </Box>
+            {item.tags && item.tags.length > 0 && (
+              <Chip
+                label={item.tags[0]}
+                size="small"
+                variant="outlined"
+                sx={{ fontSize: '0.65rem', height: '18px' }}
+              />
+            )}
+          </Box>
+        </CardContent>
+        
+        <CardActions sx={{ pt: 0, px: 2, pb: 2 }}>
+          <Button
+            fullWidth
+            variant="contained"
+            startIcon={<SwapHoriz />}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSwapRequest(item);
+            }}
+            disabled={!item.isAvailable}
+            sx={{ borderRadius: 2 }}
+          >
+            {item.isAvailable ? 'Request Swap' : 'Unavailable'}
+          </Button>
+        </CardActions>
+      </Card>
+    );
+  };
 
   const renderFilterDrawer = () => (
     <Drawer
@@ -815,17 +878,36 @@ const ItemListingPage = () => {
           <Grid container spacing={2}>
             {Array(12).fill(0).map((_, index) => (
               <Grid item xs={12} sm={6} md={4} xl={3} key={index}>
-                <Card>
-                  <Skeleton variant="rectangular" height={200} />
+                <Card sx={{ borderRadius: 2, overflow: 'hidden' }}>
+                  <Skeleton variant="rectangular" height={240} />
                   <CardContent>
-                    <Skeleton variant="text" height={28} />
-                    <Skeleton variant="text" height={18} />
-                    <Skeleton variant="text" height={18} />
-                    <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                    <Skeleton variant="text" height={28} sx={{ mb: 1 }} />
+                    <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                      <Skeleton variant="rounded" width={60} height={20} />
                       <Skeleton variant="rounded" width={50} height={20} />
-                      <Skeleton variant="rounded" width={30} height={20} />
+                      <Skeleton variant="rounded" width={40} height={20} />
+                    </Box>
+                    <Skeleton variant="text" height={18} sx={{ mb: 1 }} />
+                    <Skeleton variant="text" height={18} sx={{ mb: 1 }} />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <Skeleton variant="circular" width={20} height={20} />
+                      <Skeleton variant="text" width={80} height={16} />
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <Skeleton variant="circular" width={14} height={14} />
+                      <Skeleton variant="text" width={100} height={16} />
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box sx={{ display: 'flex', gap: 0.5 }}>
+                        <Skeleton variant="rounded" width={40} height={18} />
+                        <Skeleton variant="rounded" width={30} height={18} />
+                      </Box>
+                      <Skeleton variant="rounded" width={50} height={18} />
                     </Box>
                   </CardContent>
+                  <CardActions sx={{ pt: 0, px: 2, pb: 2 }}>
+                    <Skeleton variant="rounded" width="100%" height={36} />
+                  </CardActions>
                 </Card>
               </Grid>
             ))}
@@ -914,18 +996,39 @@ const ItemListingPage = () => {
           {swapRequestItem && (
             <Box>
               <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                <Box
-                  component="img"
-                  src={swapRequestItem.images?.[0] || 'https://via.placeholder.com/100x100/f5f5f5/999?text=No+Image'}
-                  alt={swapRequestItem.title}
-                  sx={{ 
-                    width: 100, 
-                    height: 100, 
-                    objectFit: 'cover', 
-                    borderRadius: 2,
-                    backgroundColor: 'grey.100'
-                  }}
-                />
+                {swapRequestItem.images && swapRequestItem.images.length > 0 ? (
+                  <Box
+                    component="img"
+                    src={swapRequestItem.images[0]}
+                    alt={swapRequestItem.title}
+                    sx={{ 
+                      width: 100, 
+                      height: 100, 
+                      objectFit: 'cover', 
+                      borderRadius: 2,
+                      backgroundColor: 'grey.100'
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <Box sx={{ 
+                  width: 100, 
+                  height: 100, 
+                  borderRadius: 2,
+                  backgroundColor: 'grey.100',
+                  display: swapRequestItem.images && swapRequestItem.images.length > 0 ? 'none' : 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'column'
+                }}>
+                  <Checkroom sx={{ fontSize: 32, color: 'grey.400', mb: 0.5 }} />
+                  <Typography variant="caption" color="grey.400">
+                    No Image
+                  </Typography>
+                </Box>
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="h6" gutterBottom>
                     {swapRequestItem.title}
