@@ -3,62 +3,35 @@ import {
   Box,
   Container,
   Grid,
-  Card,
-  CardContent,
-  CardMedia,
   Typography,
   TextField,
   InputAdornment,
-  IconButton, 
+  IconButton,
   Button,
-  Chip,
-  Paper,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Pagination,
-  Skeleton,
-  Avatar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   AppBar,
   Toolbar,
-  Drawer,
-  Fab,
   Autocomplete,
-  CardActions,
-  CircularProgress,
+  Avatar,
+  Snackbar,
   Alert,
-  Snackbar
+  useTheme,
+  useMediaQuery,
+  Paper,
 } from '@mui/material';
-import {
-  Search,
-  FilterList,
-  GridView,
-  ViewList,
-  Favorite,
-  FavoriteBorder,
-  LocationOn,
-  Visibility,
-  SwapHoriz,
-  Close,
-  ArrowBack,
-  AccountCircle,
-  Checkroom,
-  Refresh,
-  Add
-} from '@mui/icons-material';
+import { Search, FilterList, ArrowBack, AccountCircle, Checkroom } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ApiService from '../services/apiService';
 import { debounce } from 'lodash';
+import ItemCard from './items/ItemCard';
+import FilterSidebar from './items/FilterSidebar';
 
 const ItemListingPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // State management
   const [items, setItems] = useState([]);
@@ -75,25 +48,28 @@ const ItemListingPage = () => {
     color: '',
     brand: '',
     location: '',
-    sortBy: 'newest'
+    sortBy: 'newest',
   });
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
-    itemsPerPage: 12
+    itemsPerPage: 12,
   });
-  const [viewMode, setViewMode] = useState('grid');
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
-  const [swapRequestOpen, setSwapRequestOpen] = useState(false);
-  const [swapRequestItem, setSwapRequestItem] = useState(null);
-  const [likedItems, setLikedItems] = useState(new Set());
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
-  const [imageErrors, setImageErrors] = useState(new Set());
-  const [imageLoading, setImageLoading] = useState(new Set());
 
   // Constants
-  const categories = ['all', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Footwear', 'Accessories', 'Other'];
+  const categories = [
+    'all',
+    'Tops',
+    'Bottoms',
+    'Dresses',
+    'Outerwear',
+    'Footwear',
+    'Accessories',
+    'Other',
+  ];
   const sizes = ['all', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'];
   const conditions = ['all', 'Excellent', 'Good', 'Fair', 'Poor'];
   const sortOptions = [
@@ -103,7 +79,7 @@ const ItemListingPage = () => {
     { value: 'pointsHighToLow', label: 'Points: High to Low' },
     { value: 'mostViewed', label: 'Most Viewed' },
     { value: 'mostLiked', label: 'Most Liked' },
-    { value: 'alphabetical', label: 'A-Z' }
+    { value: 'alphabetical', label: 'A-Z' },
   ];
 
   // Debounced search function
@@ -124,43 +100,33 @@ const ItemListingPage = () => {
   );
 
   // Fetch items
-  const fetchItems = useCallback(async (page = 1) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const params = {
-        page: page.toString(),
-        limit: pagination.itemsPerPage.toString(),
-        ...filters
-      };
-      
-      if (searchTerm) params.search = searchTerm;
+  const fetchItems = useCallback(
+    async (page = 1) => {
+      setLoading(true);
+      setError(null);
 
-      const data = await ApiService.get('/api/items', params);
-      
-      setItems(data.items);
-      setPagination(data.pagination);
-      
-      // Reset image states for new items
-      setImageErrors(new Set());
-      setImageLoading(new Set());
-      
-      // Track liked items
-      const userLikedItems = new Set();
-      data.items.forEach(item => {
-        if (item.likes.includes(user?.id)) {
-          userLikedItems.add(item._id);
-        }
-      });
-      setLikedItems(userLikedItems);
-    } catch (error) {
-      console.error('Error fetching items:', error);
-      setError('Network error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, searchTerm, pagination.itemsPerPage, user?.id]);
+      try {
+        const params = {
+          page: page.toString(),
+          limit: pagination.itemsPerPage.toString(),
+          ...filters,
+        };
+
+        if (searchTerm) params.search = searchTerm;
+
+        const data = await ApiService.get('/api/items', params);
+
+        setItems(data.items);
+        setPagination(data.pagination);
+      } catch (error) {
+        console.error('Error fetching items:', error);
+        setError('Network error. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filters, searchTerm, pagination.itemsPerPage]
+  );
 
   // Effects
   useEffect(() => {
@@ -178,93 +144,13 @@ const ItemListingPage = () => {
   };
 
   const handleFilterChange = (filterName, value) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [filterName]: value
+      [filterName]: value,
     }));
   };
 
-  const handlePageChange = (event, page) => {
-    fetchItems(page);
-    window.scrollTo(0, 0);
-  };
-
-  const handleItemClick = async (item) => {
-    // Future implementation for item detail view
-    console.log('Item clicked:', item);
-  };
-
-  const handleLikeToggle = async (itemId, event) => {
-    event.stopPropagation();
-    
-    if (!user) {
-      showSnackbar('Please sign in to like items', 'warning');
-      return;
-    }
-
-    try {
-      const data = await ApiService.post(`/api/items/${itemId}/like`, { userId: user.id });
-      
-      setLikedItems(prev => {
-        const newSet = new Set(prev);
-        if (data.isLiked) {
-          newSet.add(itemId);
-        } else {
-          newSet.delete(itemId);
-        }
-        return newSet;
-      });
-      
-      // Update item in list
-      setItems(prev => prev.map(item => 
-        item._id === itemId 
-          ? { ...item, likes: data.isLiked 
-              ? [...item.likes, user.id] 
-              : item.likes.filter(id => id !== user.id) 
-            }
-          : item
-      ));
-      
-      showSnackbar(data.message, 'success');
-    } catch (error) {
-      console.error('Error toggling like:', error);
-      showSnackbar('Failed to update like', 'error');
-    }
-  };
-
-  const handleSwapRequest = (item) => {
-    if (!user) {
-      showSnackbar('Please sign in to request swaps', 'warning');
-      return;
-    }
-    
-    // Open swap request dialog
-    setSwapRequestItem(item);
-    setSwapRequestOpen(true);
-  };
-
-  const handleSwapRequestSubmit = async () => {
-    if (!swapRequestItem) return;
-    
-    try {
-      // Call API to create swap request
-      const response = await ApiService.post(`/api/swaps/request`, {
-        itemId: swapRequestItem._id,
-        requesterId: user.id,
-        requesterItemId: swapRequestItem._id, // Temporary: using the same item ID
-        message: `I'd like to swap for your ${swapRequestItem.title}`
-      });
-      
-      showSnackbar('Swap request sent successfully!', 'success');
-      setSwapRequestOpen(false);
-      setSwapRequestItem(null);
-    } catch (error) {
-      console.error('Error sending swap request:', error);
-      showSnackbar('Failed to send swap request. Please try again.', 'error');
-    }
-  };
-
-  const clearFilters = () => {
+  const handleClearFilters = () => {
     setFilters({
       category: 'all',
       size: 'all',
@@ -274,666 +160,213 @@ const ItemListingPage = () => {
       color: '',
       brand: '',
       location: '',
-      sortBy: 'newest'
+      sortBy: 'newest',
     });
     setSearchTerm('');
+  };
+
+  const handlePageChange = (event, page) => {
+    fetchItems(page);
+    window.scrollTo(0, 0);
+  };
+
+  const handleItemClick = (item) => {
+    navigate(`/item/${item._id}`);
+  };
+
+  const handleLikeToggle = async (itemId, event) => {
+    event.stopPropagation();
+
+    if (!user) {
+      showSnackbar('Please sign in to like items', 'warning');
+      return;
+    }
+
+    try {
+      const data = await ApiService.post(`/api/items/${itemId}/like`, { userId: user.id });
+
+      // Update item in list
+      setItems((prev) =>
+        prev.map((item) =>
+          item._id === itemId
+            ? {
+                ...item,
+                likes: data.isLiked
+                  ? [...(item.likes || []), user.id]
+                  : (item.likes || []).filter((id) => id !== user.id),
+              }
+            : item
+        )
+      );
+
+      showSnackbar(data.message, 'success');
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      showSnackbar('Failed to update like', 'error');
+    }
+  };
+
+  const handleSwapRequest = async (item) => {
+    if (!user) {
+      showSnackbar('Please sign in to request swaps', 'warning');
+      return;
+    }
+
+    // Logic for opening swap dialog would go here
+    // For now just showing a message as the dialog component wasn't fully extracted yet
+    showSnackbar('Swap request feature coming soon!', 'info');
   };
 
   const showSnackbar = (message, severity = 'info') => {
     setSnackbar({ open: true, message, severity });
   };
 
-  const getConditionColor = (condition) => {
-    switch (condition) {
-      case 'Excellent': return 'success';
-      case 'Good': return 'primary';
-      case 'Fair': return 'warning';
-      case 'Poor': return 'error';
-      default: return 'default';
-    }
-  };
-
-  const renderItemCard = (item) => {
-    const hasImageError = imageErrors.has(item._id);
-    const isImageLoading = imageLoading.has(item._id);
-
-    const handleImageError = () => {
-      setImageErrors(prev => new Set([...prev, item._id]));
-      setImageLoading(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(item._id);
-        return newSet;
-      });
-    };
-
-    const handleImageLoad = () => {
-      setImageLoading(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(item._id);
-        return newSet;
-      });
-    };
-
-    const handleImageStart = () => {
-      setImageLoading(prev => new Set([...prev, item._id]));
-    };
-
-    return (
-      <Card 
-        key={item._id}
-        sx={{ 
-          height: '100%', 
-          display: 'flex', 
-          flexDirection: 'column',
-          cursor: 'pointer',
-          transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-          borderRadius: 2,
-          overflow: 'hidden',
-          '&:hover': {
-            transform: 'translateY(-4px)',
-            boxShadow: (theme) => theme.shadows[8]
-          }
-        }}
-        onClick={() => handleItemClick(item)}
-      >
-        <Box sx={{ position: 'relative', height: 240 }}>
-          {/* Image Loading Skeleton */}
-          {isImageLoading && (
-            <Box sx={{ 
-              position: 'absolute', 
-              top: 0, 
-              left: 0, 
-              right: 0, 
-              bottom: 0, 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              bgcolor: 'grey.100',
-              zIndex: 1
-            }}>
-              <CircularProgress size={24} />
-            </Box>
-          )}
-          
-          {/* Main Image */}
-          {!hasImageError && item.images && item.images.length > 0 ? (
-            <CardMedia
-              component="img"
-              height="240"
-              image={item.images[0]}
-              alt={item.title}
-              onError={handleImageError}
-              onLoad={handleImageLoad}
-              onLoadStart={handleImageStart}
-              sx={{ 
-                objectFit: 'cover',
-                backgroundColor: 'grey.100',
-                display: isImageLoading ? 'none' : 'block'
-              }}
-            />
-          ) : (
-            <Box sx={{ 
-              height: '240px', 
-              backgroundColor: 'grey.100',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'column'
-            }}>
-              <Checkroom sx={{ fontSize: 48, color: 'grey.400', mb: 1 }} />
-              <Typography variant="body2" color="grey.400">
-                No Image Available
-              </Typography>
-            </Box>
-          )}
-
-          {/* Overlay Gradient */}
-          <Box sx={{ 
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '50%',
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), transparent)',
-            pointerEvents: 'none'
-          }} />
-          
-          {/* Action Buttons */}
-          <Box sx={{ 
-            position: 'absolute', 
-            top: 8, 
-            right: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1
-          }}>
-            <IconButton
-              size="small"
-              onClick={(e) => handleLikeToggle(item._id, e)}
-              sx={{ 
-                bgcolor: 'rgba(255, 255, 255, 0.9)',
-                backdropFilter: 'blur(4px)',
-                '&:hover': { bgcolor: 'rgba(255, 255, 255, 1)' }
-              }}
-            >
-              {likedItems.has(item._id) ? 
-                <Favorite sx={{ color: 'red' }} /> : 
-                <FavoriteBorder />
-              }
-            </IconButton>
-            <Chip
-              label={`${item.pointsValue} pts`}
-              size="small"
-              sx={{ 
-                bgcolor: 'rgba(76, 175, 80, 0.95)',
-                color: 'white',
-                fontWeight: 'bold',
-                backdropFilter: 'blur(4px)'
-              }}
-            />
-          </Box>
-          
-          {/* Status Chips */}
-          <Box sx={{ 
-            position: 'absolute', 
-            bottom: 8, 
-            left: 8,
-            display: 'flex',
-            gap: 1,
-            flexWrap: 'wrap'
-          }}>
-            <Chip
-              label={item.condition}
-              size="small"
-              color={getConditionColor(item.condition)}
-              sx={{ 
-                bgcolor: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(4px)'
-              }}
-            />
-            <Chip
-              label={item.isAvailable ? 'Available' : 'Unavailable'}
-              size="small"
-              color={item.isAvailable ? 'success' : 'warning'}
-              sx={{ 
-                bgcolor: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(4px)'
-              }}
-            />
-          </Box>
-        </Box>
-        
-        <CardContent sx={{ flexGrow: 1, pb: 1, px: 2, pt: 2 }}>
-          <Typography variant="h6" component="h2" noWrap gutterBottom sx={{ fontSize: '1.1rem' }}>
-            {item.title}
-          </Typography>
-          
-          {/* Item details in a compact format */}
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
-            <Chip 
-              label={item.category} 
-              size="small" 
-              variant="outlined" 
-              sx={{ fontSize: '0.7rem', height: '20px' }}
-            />
-            <Chip 
-              label={`Size ${item.size}`} 
-              size="small" 
-              variant="outlined" 
-              sx={{ fontSize: '0.7rem', height: '20px' }}
-            />
-            {item.brand && (
-              <Chip 
-                label={item.brand} 
-                size="small" 
-                variant="outlined" 
-                sx={{ fontSize: '0.7rem', height: '20px' }}
-              />
-            )}
-          </Box>
-          
-          <Typography 
-            variant="body2" 
-            color="text.secondary" 
-            sx={{ 
-              mb: 1.5,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              minHeight: '2.5em',
-              fontSize: '0.85rem'
-            }}
-          >
-            {item.description}
-          </Typography>
-          
-          {/* User info */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <Avatar 
-              sx={{ width: 20, height: 20 }}
-              src={item.userId?.avatar}
-            >
-              {item.userId?.name?.charAt(0)}
-            </Avatar>
-            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-              {item.userId?.name}
-            </Typography>
-          </Box>
-          
-          {/* Location */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <LocationOn sx={{ fontSize: 14, color: 'text.secondary' }} />
-            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-              {item.location?.city}, {item.location?.state}
-            </Typography>
-          </Box>
-          
-          {/* Stats */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box sx={{ display: 'flex', gap: 0.5 }}>
-              <Chip 
-                icon={<Visibility />} 
-                label={item.views} 
-                size="small" 
-                variant="outlined"
-                sx={{ fontSize: '0.65rem', height: '18px' }}
-              />
-              <Chip 
-                icon={<Favorite />} 
-                label={item.likes?.length || 0} 
-                size="small" 
-                variant="outlined"
-                sx={{ fontSize: '0.65rem', height: '18px' }}
-              />
-            </Box>
-            {item.tags && item.tags.length > 0 && (
-              <Chip
-                label={item.tags[0]}
-                size="small"
-                variant="outlined"
-                sx={{ fontSize: '0.65rem', height: '18px' }}
-              />
-            )}
-          </Box>
-        </CardContent>
-        
-        <CardActions sx={{ pt: 0, px: 2, pb: 2 }}>
-          <Button
-            fullWidth
-            variant="contained"
-            startIcon={<SwapHoriz />}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSwapRequest(item);
-            }}
-            disabled={!item.isAvailable}
-            sx={{ borderRadius: 2 }}
-          >
-            {item.isAvailable ? 'Request Swap' : 'Unavailable'}
-          </Button>
-        </CardActions>
-      </Card>
-    );
-  };
-
-  const renderFilterDrawer = () => (
-    <Drawer
-      anchor="right"
-      open={filterDrawerOpen}
-      onClose={() => setFilterDrawerOpen(false)}
-      PaperProps={{
-        sx: { width: { xs: '100%', sm: 400 }, p: 2 }
-      }}
-    >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-        <Typography variant="h6">Filters</Typography>
-        <IconButton onClick={() => setFilterDrawerOpen(false)}>
-          <Close />
-        </IconButton>
-      </Box>
-      
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        {/* Category Filter */}
-        <FormControl fullWidth>
-          <InputLabel>Category</InputLabel>
-          <Select
-            value={filters.category}
-            onChange={(e) => handleFilterChange('category', e.target.value)}
-          >
-            {categories.map(cat => (
-              <MenuItem key={cat} value={cat}>
-                {cat === 'all' ? 'All Categories' : cat}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* Size Filter */}
-        <FormControl fullWidth>
-          <InputLabel>Size</InputLabel>
-          <Select
-            value={filters.size}
-            onChange={(e) => handleFilterChange('size', e.target.value)}
-          >
-            {sizes.map(size => (
-              <MenuItem key={size} value={size}>
-                {size === 'all' ? 'All Sizes' : size}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* Condition Filter */}
-        <FormControl fullWidth>
-          <InputLabel>Condition</InputLabel>
-          <Select
-            value={filters.condition}
-            onChange={(e) => handleFilterChange('condition', e.target.value)}
-          >
-            {conditions.map(cond => (
-              <MenuItem key={cond} value={cond}>
-                {cond === 'all' ? 'All Conditions' : cond}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* Points Range */}
-        <Box>
-          <Typography variant="subtitle2" gutterBottom>
-            Points Range
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField
-              label="Min"
-              type="number"
-              size="small"
-              value={filters.minPoints}
-              onChange={(e) => handleFilterChange('minPoints', e.target.value)}
-              inputProps={{ min: 1, max: 100 }}
-            />
-            <TextField
-              label="Max"
-              type="number"
-              size="small"
-              value={filters.maxPoints}
-              onChange={(e) => handleFilterChange('maxPoints', e.target.value)}
-              inputProps={{ min: 1, max: 100 }}
-            />
-          </Box>
-        </Box>
-
-        {/* Color Filter */}
-        <TextField
-          label="Color"
-          value={filters.color}
-          onChange={(e) => handleFilterChange('color', e.target.value)}
-          placeholder="e.g., blue, red, black"
-        />
-
-        {/* Brand Filter */}
-        <TextField
-          label="Brand"
-          value={filters.brand}
-          onChange={(e) => handleFilterChange('brand', e.target.value)}
-          placeholder="e.g., Nike, Zara, H&M"
-        />
-
-        {/* Location Filter */}
-        <TextField
-          label="Location"
-          value={filters.location}
-          onChange={(e) => handleFilterChange('location', e.target.value)}
-          placeholder="City or State"
-        />
-
-        {/* Sort By */}
-        <FormControl fullWidth>
-          <InputLabel>Sort By</InputLabel>
-          <Select
-            value={filters.sortBy}
-            onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-          >
-            {sortOptions.map(option => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* Action Buttons */}
-        <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-          <Button
-            variant="outlined"
-            onClick={clearFilters}
-            startIcon={<Refresh />}
-          >
-            Clear All
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => setFilterDrawerOpen(false)}
-            sx={{ flex: 1 }}
-          >
-            Apply Filters
-          </Button>
-        </Box>
-      </Box>
-    </Drawer>
-  );
-
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
       {/* Header */}
-      <AppBar position="static" sx={{ bgcolor: 'primary.main' }}>
+      <AppBar
+        position="sticky"
+        elevation={0}
+        sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}
+      >
         <Toolbar>
           <IconButton
-            color="inherit"
+            edge="start"
             onClick={() => navigate('/')}
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, color: 'text.primary' }}
           >
             <ArrowBack />
           </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1, color: 'text.primary', fontWeight: 'bold' }}
+          >
             Browse Items
           </Typography>
-          <IconButton
-            color="inherit"
-            onClick={() => navigate('/dashboard')}
-          >
+          <IconButton onClick={() => navigate('/dashboard')} sx={{ color: 'text.primary' }}>
             <AccountCircle />
           </IconButton>
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="xl" sx={{ py: 3 }}>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Search and Filter Bar */}
-        <Paper elevation={2} sx={{ p: 2, mb: 3 }}>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-            {/* Search */}
-            <Autocomplete
-              freeSolo
-              options={searchSuggestions}
-              getOptionLabel={(option) => option.title || option}
-              renderOption={(props, option) => (
-                <li {...props}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Avatar
-                      src={option.image}
-                      sx={{ width: 32, height: 32 }}
-                    >
-                      <Checkroom />
-                    </Avatar>
-                    <Box>
-                      <Typography variant="body2">{option.title}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {option.brand} • {option.category}
-                      </Typography>
-                    </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            alignItems: 'center',
+            mb: 4,
+            flexDirection: { xs: 'column', md: 'row' },
+          }}
+        >
+          <Autocomplete
+            freeSolo
+            options={searchSuggestions}
+            getOptionLabel={(option) => option.title || option}
+            renderOption={(props, option) => (
+              <li {...props}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1 }}>
+                  <Avatar src={option.images?.[0]} variant="rounded" sx={{ width: 40, height: 40 }}>
+                    <Checkroom />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="body2" fontWeight="bold">
+                      {option.title}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {option.brand} • {option.category}
+                    </Typography>
                   </Box>
-                </li>
-              )}
-              sx={{ minWidth: 300, flex: 1 }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="Search items..."
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              )}
-              inputValue={searchTerm}
-              onInputChange={(event, newValue) => handleSearchChange(newValue)}
-            />
+                </Box>
+              </li>
+            )}
+            sx={{ flex: 1, width: '100%' }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="Search items, brands, or categories..."
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search color="action" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            )}
+            inputValue={searchTerm}
+            onInputChange={(event, newValue) => handleSearchChange(newValue)}
+          />
 
-            {/* Quick Filters */}
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              <Button
-                variant={filters.category === 'all' ? 'contained' : 'outlined'}
-                onClick={() => handleFilterChange('category', 'all')}
-                size="small"
-              >
-                All
-              </Button>
-              <Button
-                variant={filters.category === 'Tops' ? 'contained' : 'outlined'}
-                onClick={() => handleFilterChange('category', 'Tops')}
-                size="small"
-              >
-                Tops
-              </Button>
-              <Button
-                variant={filters.category === 'Bottoms' ? 'contained' : 'outlined'}
-                onClick={() => handleFilterChange('category', 'Bottoms')}
-                size="small"
-              >
-                Bottoms
-              </Button>
-              <Button
-                variant={filters.category === 'Dresses' ? 'contained' : 'outlined'}
-                onClick={() => handleFilterChange('category', 'Dresses')}
-                size="small"
-              >
-                Dresses
-              </Button>
-            </Box>
+          <Button
+            variant="outlined"
+            startIcon={<FilterList />}
+            onClick={() => setFilterDrawerOpen(true)}
+            sx={{
+              height: 56,
+              px: 4,
+              width: { xs: '100%', md: 'auto' },
+              borderColor: 'divider',
+              color: 'text.primary',
+            }}
+          >
+            Filters
+          </Button>
+        </Box>
 
-            {/* Filter and View Controls */}
-            <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
-              <Button
-                variant="outlined"
-                startIcon={<FilterList />}
-                onClick={() => setFilterDrawerOpen(true)}
-              >
-                Filters
-              </Button>
-              <Button
-                variant={viewMode === 'grid' ? 'contained' : 'outlined'}
-                onClick={() => setViewMode('grid')}
-                size="small"
-              >
-                <GridView />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'contained' : 'outlined'}
-                onClick={() => setViewMode('list')}
-                size="small"
-              >
-                <ViewList />
-              </Button>
-            </Box>
-          </Box>
-        </Paper>
-
-        {/* Results Summary */}
+        {/* Results Count */}
         <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="body1">
-            {loading ? 'Loading...' : `${pagination.totalItems} items found`}
+          <Typography variant="body1" color="text.secondary">
+            Showing <strong>{items.length}</strong> of <strong>{pagination.totalItems}</strong>{' '}
+            items
           </Typography>
-          <FormControl size="small" sx={{ minWidth: 160 }}>
-            <InputLabel>Sort By</InputLabel>
-            <Select
-              value={filters.sortBy}
-              onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-            >
-              {sortOptions.map(option => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
         </Box>
 
         {/* Items Grid */}
         {loading ? (
-          <Grid container spacing={2}>
-            {Array(12).fill(0).map((_, index) => (
-              <Grid item xs={12} sm={6} md={4} xl={3} key={index}>
-                <Card sx={{ borderRadius: 2, overflow: 'hidden' }}>
-                  <Skeleton variant="rectangular" height={240} />
-                  <CardContent>
-                    <Skeleton variant="text" height={28} sx={{ mb: 1 }} />
-                    <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                      <Skeleton variant="rounded" width={60} height={20} />
-                      <Skeleton variant="rounded" width={50} height={20} />
-                      <Skeleton variant="rounded" width={40} height={20} />
-                    </Box>
-                    <Skeleton variant="text" height={18} sx={{ mb: 1 }} />
-                    <Skeleton variant="text" height={18} sx={{ mb: 1 }} />
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                      <Skeleton variant="circular" width={20} height={20} />
-                      <Skeleton variant="text" width={80} height={16} />
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                      <Skeleton variant="circular" width={14} height={14} />
-                      <Skeleton variant="text" width={100} height={16} />
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box sx={{ display: 'flex', gap: 0.5 }}>
-                        <Skeleton variant="rounded" width={40} height={18} />
-                        <Skeleton variant="rounded" width={30} height={18} />
-                      </Box>
-                      <Skeleton variant="rounded" width={50} height={18} />
-                    </Box>
-                  </CardContent>
-                  <CardActions sx={{ pt: 0, px: 2, pb: 2 }}>
-                    <Skeleton variant="rounded" width="100%" height={36} />
-                  </CardActions>
-                </Card>
+          <Grid container spacing={3}>
+            {[...Array(8)].map((_, i) => (
+              <Grid item key={i} xs={12} sm={6} md={4} lg={3}>
+                <Box sx={{ height: 400, bgcolor: 'grey.100', borderRadius: 2 }} />
               </Grid>
             ))}
           </Grid>
         ) : error ? (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
-        ) : items.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 8 }}>
-            <Checkroom sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+            <Typography color="error" gutterBottom>
+              {error}
+            </Typography>
+            <Button variant="outlined" onClick={() => fetchItems()}>
+              Try Again
+            </Button>
+          </Box>
+        ) : items.length === 0 ? (
+          <Box sx={{ textAlign: 'center', py: 12 }}>
+            <Checkroom sx={{ fontSize: 64, color: 'text.secondary', mb: 2, opacity: 0.5 }} />
             <Typography variant="h6" color="text.secondary" gutterBottom>
               No items found
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Try adjusting your filters or search terms
+              Try adjusting your search or filters
             </Typography>
-            <Button variant="outlined" onClick={clearFilters}>
-              Clear Filters
+            <Button variant="contained" onClick={handleClearFilters}>
+              Clear All Filters
             </Button>
           </Box>
         ) : (
-          <Grid container spacing={2}>
+          <Grid container spacing={3}>
             {items.map((item) => (
-              <Grid item xs={12} sm={6} md={4} xl={3} key={item._id}>
-                {renderItemCard(item)}
+              <Grid item key={item._id} xs={12} sm={6} md={4} lg={3}>
+                <ItemCard
+                  item={item}
+                  user={user}
+                  onLikeToggle={handleLikeToggle}
+                  onSwapRequest={handleSwapRequest}
+                  onClick={handleItemClick}
+                />
               </Grid>
             ))}
           </Grid>
@@ -941,29 +374,30 @@ const ItemListingPage = () => {
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
             <Pagination
               count={pagination.totalPages}
               page={pagination.currentPage}
               onChange={handlePageChange}
               color="primary"
-              size="large"
+              size={isMobile ? 'medium' : 'large'}
             />
           </Box>
         )}
       </Container>
 
-      {/* Filter Drawer */}
-      {renderFilterDrawer()}
-
-      {/* Floating Action Button */}
-      <Fab
-        color="primary"
-        sx={{ position: 'fixed', bottom: 16, right: 16 }}
-        onClick={() => navigate('/dashboard')}
-      >
-        <Add />
-      </Fab>
+      {/* Filter Sidebar */}
+      <FilterSidebar
+        open={filterDrawerOpen}
+        onClose={() => setFilterDrawerOpen(false)}
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onClearFilters={handleClearFilters}
+        categories={categories}
+        sizes={sizes}
+        conditions={conditions}
+        sortOptions={sortOptions}
+      />
 
       {/* Snackbar */}
       <Snackbar
@@ -971,107 +405,15 @@ const ItemListingPage = () => {
         autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
-        <Alert 
-          severity={snackbar.severity} 
+        <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
         >
           {snackbar.message}
         </Alert>
       </Snackbar>
-
-      {/* Swap Request Dialog */}
-      <Dialog 
-        open={swapRequestOpen} 
-        onClose={() => setSwapRequestOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <SwapHoriz color="primary" />
-            Request Item Swap
-          </Box>
-        </DialogTitle>
-        <DialogContent>
-          {swapRequestItem && (
-            <Box>
-              <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                {swapRequestItem.images && swapRequestItem.images.length > 0 ? (
-                  <Box
-                    component="img"
-                    src={swapRequestItem.images[0]}
-                    alt={swapRequestItem.title}
-                    sx={{ 
-                      width: 100, 
-                      height: 100, 
-                      objectFit: 'cover', 
-                      borderRadius: 2,
-                      backgroundColor: 'grey.100'
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                ) : null}
-                <Box sx={{ 
-                  width: 100, 
-                  height: 100, 
-                  borderRadius: 2,
-                  backgroundColor: 'grey.100',
-                  display: swapRequestItem.images && swapRequestItem.images.length > 0 ? 'none' : 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexDirection: 'column'
-                }}>
-                  <Checkroom sx={{ fontSize: 32, color: 'grey.400', mb: 0.5 }} />
-                  <Typography variant="caption" color="grey.400">
-                    No Image
-                  </Typography>
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="h6" gutterBottom>
-                    {swapRequestItem.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {swapRequestItem.brand && `${swapRequestItem.brand} • `}
-                    {swapRequestItem.category} • Size {swapRequestItem.size}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Condition: {swapRequestItem.condition}
-                  </Typography>
-                  <Typography variant="body2" color="success.main" fontWeight="bold">
-                    {swapRequestItem.pointsValue} Points
-                  </Typography>
-                </Box>
-              </Box>
-              
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Owner: {swapRequestItem.userId?.name}
-              </Typography>
-              
-              <Typography variant="body2" color="text.secondary">
-                You are about to request a swap for this item. The owner will be notified and can respond to your request.
-              </Typography>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button 
-            onClick={() => setSwapRequestOpen(false)}
-            color="inherit"
-          >
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleSwapRequestSubmit}
-            variant="contained"
-            startIcon={<SwapHoriz />}
-          >
-            Send Request
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };

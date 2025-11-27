@@ -8,8 +8,6 @@ import {
   Card,
   CardContent,
   CardMedia,
-  AppBar,
-  Toolbar,
   useTheme,
   Stack,
   Paper,
@@ -27,10 +25,6 @@ import {
   Favorite,
   Groups,
   Search,
-  Home,
-  Category,
-  Login,
-  PersonAdd,
   Woman,
   Man,
   ChildCare,
@@ -55,20 +49,20 @@ const LandingPage = () => {
   const categories = [
     {
       icon: <Woman sx={{ fontSize: 50, color: '#FF6B9D' }} />,
-      title: 'Women\'s Clothing',
+      title: "Women's Clothing",
       description: 'Dresses, tops, bottoms, outerwear',
       color: '#FF6B9D',
     },
     {
       icon: <Man sx={{ fontSize: 50, color: '#4A90E2' }} />,
-      title: 'Men\'s Clothing',
+      title: "Men's Clothing",
       description: 'Shirts, pants, jackets, suits',
       color: '#4A90E2',
     },
     {
       icon: <ChildCare sx={{ fontSize: 50, color: '#FFD93D' }} />,
       title: 'Kids & Baby',
-      description: 'Children\'s clothes, baby wear',
+      description: "Children's clothes, baby wear",
       color: '#FFD93D',
     },
     {
@@ -158,61 +152,6 @@ const LandingPage = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      {/* Header */}
-      <AppBar position="static" sx={{ bgcolor: 'white', boxShadow: 1 }}>
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Recycling sx={{ mr: 1, color: theme.palette.primary.main, fontSize: 32 }} />
-            <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-              ReWear
-            </Typography>
-          </Box>
-          
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <Button
-              color="inherit"
-              startIcon={<Home />}
-              sx={{ color: 'text.primary', textTransform: 'none' }}
-            >
-              Home
-            </Button>
-            <Button
-              color="inherit"
-              startIcon={<Category />}
-              onClick={() => navigate('/browse')}
-              sx={{ color: 'text.primary', textTransform: 'none' }}
-            >
-              Browse
-            </Button>
-            <Button
-              color="inherit"
-              sx={{ color: 'text.primary', textTransform: 'none' }}
-            >
-              About
-            </Button>
-          </Box>
-
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button
-              variant="outlined"
-              startIcon={<Login />}
-              onClick={() => navigate('/signin')}
-              sx={{ textTransform: 'none' }}
-            >
-              Sign In
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<PersonAdd />}
-              onClick={() => navigate('/signup')}
-              sx={{ textTransform: 'none' }}
-            >
-              Sign Up
-            </Button>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
       {/* Hero Section */}
       <Container maxWidth="lg" sx={{ mt: 6, mb: 8 }}>
         <Box sx={{ textAlign: 'center', mb: 6 }}>
@@ -231,27 +170,23 @@ const LandingPage = () => {
           >
             Community Clothing Exchange
           </Typography>
-          <Typography
-            variant="h6"
-            color="text.secondary"
-            sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}
-          >
-            Discover, exchange, and share clothing within your community. 
-            Sustainable fashion made simple and accessible for everyone.
+          <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
+            Discover, exchange, and share clothing within your community. Sustainable fashion made
+            simple and accessible for everyone.
           </Typography>
-          
+
           {/* Search Bar */}
           <Box sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
             <TextField
               fullWidth
               placeholder="Search for clothing items, brands, or styles..."
               variant="outlined"
-              sx={{ 
+              sx={{
                 bgcolor: 'white',
                 borderRadius: 2,
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
-                }
+                },
               }}
               InputProps={{
                 startAdornment: (
@@ -271,9 +206,9 @@ const LandingPage = () => {
           </Box>
 
           {/* CTA Buttons */}
-          <Stack 
-            direction={{ xs: 'column', sm: 'row' }} 
-            spacing={2} 
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
             sx={{ justifyContent: 'center', mb: 6 }}
           >
             <Button
@@ -345,12 +280,7 @@ const LandingPage = () => {
 
       {/* Categories Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
-        <Typography
-          variant="h3"
-          component="h2"
-          align="center"
-          sx={{ fontWeight: 'bold', mb: 2 }}
-        >
+        <Typography variant="h3" component="h2" align="center" sx={{ fontWeight: 'bold', mb: 2 }}>
           Shop by Category
         </Typography>
         <Typography
@@ -366,7 +296,11 @@ const LandingPage = () => {
           {categories.map((category, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <Card
-                onClick={() => navigate(`/browse?category=${category.title.toLowerCase().replace(/[^a-z0-9]/g, '')}`)}
+                onClick={() =>
+                  navigate(
+                    `/browse?category=${category.title.toLowerCase().replace(/[^a-z0-9]/g, '')}`
+                  )
+                }
                 sx={{
                   height: '100%',
                   textAlign: 'center',
@@ -381,9 +315,7 @@ const LandingPage = () => {
                 }}
               >
                 <CardContent sx={{ p: 4 }}>
-                  <Box sx={{ mb: 2 }}>
-                    {category.icon}
-                  </Box>
+                  <Box sx={{ mb: 2 }}>{category.icon}</Box>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
                     {category.title}
                   </Typography>
@@ -400,12 +332,7 @@ const LandingPage = () => {
       {/* Featured Items Section */}
       <Paper sx={{ py: 8, bgcolor: 'grey.50' }}>
         <Container maxWidth="lg">
-          <Typography
-            variant="h3"
-            component="h2"
-            align="center"
-            sx={{ fontWeight: 'bold', mb: 2 }}
-          >
+          <Typography variant="h3" component="h2" align="center" sx={{ fontWeight: 'bold', mb: 2 }}>
             Featured Items
           </Typography>
           <Typography
@@ -445,14 +372,23 @@ const LandingPage = () => {
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                       Shared by {item.owner}
                     </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
+                    >
                       <Chip
                         label={item.condition}
                         size="small"
                         color="success"
                         variant="outlined"
                       />
-                      <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 'bold', color: 'primary.main' }}
+                      >
                         {item.points} pts
                       </Typography>
                     </Box>
@@ -484,12 +420,7 @@ const LandingPage = () => {
 
       {/* Features Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
-        <Typography
-          variant="h3"
-          component="h2"
-          align="center"
-          sx={{ fontWeight: 'bold', mb: 2 }}
-        >
+        <Typography variant="h3" component="h2" align="center" sx={{ fontWeight: 'bold', mb: 2 }}>
           Why Choose ReWear?
         </Typography>
         <Typography
@@ -516,9 +447,7 @@ const LandingPage = () => {
                 }}
               >
                 <CardContent sx={{ p: 4 }}>
-                  <Box sx={{ mb: 2 }}>
-                    {feature.icon}
-                  </Box>
+                  <Box sx={{ mb: 2 }}>{feature.icon}</Box>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
                     {feature.title}
                   </Typography>
@@ -535,21 +464,14 @@ const LandingPage = () => {
       {/* Stats Section */}
       <Paper sx={{ py: 6, bgcolor: 'grey.50' }}>
         <Container maxWidth="lg">
-          <Typography
-            variant="h3"
-            component="h2"
-            align="center"
-            sx={{ fontWeight: 'bold', mb: 6 }}
-          >
+          <Typography variant="h3" component="h2" align="center" sx={{ fontWeight: 'bold', mb: 6 }}>
             Our Community Impact
           </Typography>
           <Grid container spacing={4}>
             {stats.map((stat, index) => (
               <Grid item xs={6} md={3} key={index}>
                 <Box sx={{ textAlign: 'center' }}>
-                  <Box sx={{ color: theme.palette.primary.main, mb: 1 }}>
-                    {stat.icon}
-                  </Box>
+                  <Box sx={{ color: theme.palette.primary.main, mb: 1 }}>{stat.icon}</Box>
                   <Typography variant="h3" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                     {stat.number}
                   </Typography>
@@ -601,62 +523,6 @@ const LandingPage = () => {
           </Button>
         </Container>
       </Paper>
-
-      {/* Footer */}
-      <Box sx={{ bgcolor: 'grey.900', color: 'white', py: 4 }}>
-        <Container maxWidth="lg">
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={6}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Recycling sx={{ mr: 1 }} />
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                  ReWear
-                </Typography>
-              </Box>
-              <Typography variant="body2" color="grey.400">
-                Making sustainable fashion accessible to everyone through community-driven clothing exchange.
-              </Typography>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                Get Started
-              </Typography>
-              <Stack direction="row" spacing={2}>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => navigate('/signin')}
-                  sx={{
-                    color: 'white',
-                    borderColor: 'white',
-                    textTransform: 'none',
-                    '&:hover': {
-                      borderColor: 'grey.300',
-                      bgcolor: 'grey.800',
-                    },
-                  }}
-                >
-                  Sign In
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => navigate('/signup')}
-                  sx={{
-                    textTransform: 'none',
-                    bgcolor: theme.palette.primary.main,
-                    '&:hover': {
-                      bgcolor: theme.palette.primary.dark,
-                    },
-                  }}
-                >
-                  Sign Up
-                </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
     </Box>
   );
 };

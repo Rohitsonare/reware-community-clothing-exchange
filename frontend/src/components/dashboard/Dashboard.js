@@ -100,7 +100,7 @@ const Dashboard = () => {
     name: '',
     bio: '',
     location: { city: '', state: '', country: 'USA' },
-    preferences: { sizes: [], categories: [], brands: [] }
+    preferences: { sizes: [], categories: [], brands: [] },
   });
 
   const [itemForm, setItemForm] = useState({
@@ -113,10 +113,18 @@ const Dashboard = () => {
     color: '',
     pointsValue: 10,
     location: { city: '', state: '', country: 'USA' },
-    tags: ''
+    tags: '',
   });
 
-  const categories = ['Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Footwear', 'Accessories', 'Other'];
+  const categories = [
+    'Tops',
+    'Bottoms',
+    'Dresses',
+    'Outerwear',
+    'Footwear',
+    'Accessories',
+    'Other',
+  ];
   const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'];
   const conditions = ['Excellent', 'Good', 'Fair', 'Poor'];
 
@@ -129,7 +137,7 @@ const Dashboard = () => {
       setLoading(true);
       const currentUser = await AuthService.getCurrentUser();
       setUser(currentUser);
-      
+
       // For demo purposes, we'll use mock data if API fails
       try {
         const data = await dashboardService.getDashboardData(currentUser.id);
@@ -159,14 +167,14 @@ const Dashboard = () => {
         category: 'Outerwear',
         size: 'M',
         condition: 'Excellent',
-        brand: 'Levi\'s',
+        brand: "Levi's",
         color: 'Blue',
         pointsValue: 25,
         isAvailable: true,
         images: ['https://images.unsplash.com/photo-1544441893-675973e31985?w=300&h=400&fit=crop'],
         views: 15,
         likes: ['user1', 'user2'],
-        createdAt: '2024-01-15T10:30:00Z'
+        createdAt: '2024-01-15T10:30:00Z',
       },
       {
         _id: '2',
@@ -179,10 +187,12 @@ const Dashboard = () => {
         color: 'Multicolor',
         pointsValue: 20,
         isAvailable: false,
-        images: ['https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=300&h=400&fit=crop'],
+        images: [
+          'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=300&h=400&fit=crop',
+        ],
         views: 8,
         likes: ['user3'],
-        createdAt: '2024-01-20T14:15:00Z'
+        createdAt: '2024-01-20T14:15:00Z',
       },
       {
         _id: '3',
@@ -198,42 +208,78 @@ const Dashboard = () => {
         images: ['https://images.unsplash.com/photo-1544966503-7cc5ac882d5c?w=300&h=400&fit=crop'],
         views: 22,
         likes: ['user4', 'user5', 'user6'],
-        createdAt: '2024-01-10T09:00:00Z'
-      }
+        createdAt: '2024-01-10T09:00:00Z',
+      },
     ],
     swaps: {
       ongoing: [
         {
           _id: '1',
           status: 'pending',
-          requesterItemId: { title: 'Vintage Denim Jacket', images: ['https://images.unsplash.com/photo-1544441893-675973e31985?w=150&h=100&fit=crop'], pointsValue: 25 },
-          ownerItemId: { title: 'Leather Boots', images: ['https://images.unsplash.com/photo-1544966503-7cc5ac882d5c?w=150&h=100&fit=crop'], pointsValue: 30 },
+          requesterItemId: {
+            title: 'Vintage Denim Jacket',
+            images: [
+              'https://images.unsplash.com/photo-1544441893-675973e31985?w=150&h=100&fit=crop',
+            ],
+            pointsValue: 25,
+          },
+          ownerItemId: {
+            title: 'Leather Boots',
+            images: [
+              'https://images.unsplash.com/photo-1544966503-7cc5ac882d5c?w=150&h=100&fit=crop',
+            ],
+            pointsValue: 30,
+          },
           requesterId: { name: 'John Doe', profilePicture: '' },
           ownerId: { name: 'Jane Smith', profilePicture: '' },
-          createdAt: '2024-01-25T12:00:00Z'
+          createdAt: '2024-01-25T12:00:00Z',
         },
         {
           _id: '2',
           status: 'accepted',
-          requesterItemId: { title: 'Summer Dress', images: ['https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=150&h=100&fit=crop'], pointsValue: 20 },
-          ownerItemId: { title: 'Casual Shirt', images: ['https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=150&h=100&fit=crop'], pointsValue: 15 },
+          requesterItemId: {
+            title: 'Summer Dress',
+            images: [
+              'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=150&h=100&fit=crop',
+            ],
+            pointsValue: 20,
+          },
+          ownerItemId: {
+            title: 'Casual Shirt',
+            images: [
+              'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=150&h=100&fit=crop',
+            ],
+            pointsValue: 15,
+          },
           requesterId: { name: 'Alice Johnson', profilePicture: '' },
           ownerId: user,
-          createdAt: '2024-01-22T16:30:00Z'
-        }
+          createdAt: '2024-01-22T16:30:00Z',
+        },
       ],
       completed: [
         {
           _id: '3',
           status: 'completed',
-          requesterItemId: { title: 'Winter Coat', images: ['https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=150&h=100&fit=crop'], pointsValue: 40 },
-          ownerItemId: { title: 'Wool Sweater', images: ['https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=150&h=100&fit=crop'], pointsValue: 35 },
+          requesterItemId: {
+            title: 'Winter Coat',
+            images: [
+              'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=150&h=100&fit=crop',
+            ],
+            pointsValue: 40,
+          },
+          ownerItemId: {
+            title: 'Wool Sweater',
+            images: [
+              'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=150&h=100&fit=crop',
+            ],
+            pointsValue: 35,
+          },
           requesterId: user,
           ownerId: { name: 'Bob Wilson', profilePicture: '' },
           completedAt: '2024-01-15T11:00:00Z',
-          rating: { requesterRating: 5, ownerRating: 4 }
-        }
-      ]
+          rating: { requesterRating: 5, ownerRating: 4 },
+        },
+      ],
     },
     stats: {
       totalPoints: user.points || 150,
@@ -241,8 +287,8 @@ const Dashboard = () => {
       totalSwaps: 3,
       ongoingSwaps: 2,
       completedSwaps: 1,
-      successRate: 100
-    }
+      successRate: 100,
+    },
   });
 
   const handleMenu = (event) => {
@@ -267,7 +313,7 @@ const Dashboard = () => {
       name: user.name || '',
       bio: user.bio || '',
       location: user.location || { city: '', state: '', country: 'USA' },
-      preferences: user.preferences || { sizes: [], categories: [], brands: [] }
+      preferences: user.preferences || { sizes: [], categories: [], brands: [] },
     });
     setProfileDialog(true);
   };
@@ -279,7 +325,7 @@ const Dashboard = () => {
       setUser(updatedUser);
       setDashboardData({
         ...dashboardData,
-        user: updatedUser
+        user: updatedUser,
       });
       setProfileDialog(false);
       showSnackbar('Profile updated successfully!', 'success');
@@ -304,7 +350,7 @@ const Dashboard = () => {
       color: item.color,
       pointsValue: item.pointsValue,
       location: item.location || { city: '', state: '', country: 'USA' },
-      tags: item.tags ? item.tags.join(', ') : ''
+      tags: item.tags ? item.tags.join(', ') : '',
     });
     setItemDialog(true);
   };
@@ -314,41 +360,47 @@ const Dashboard = () => {
       const itemData = {
         ...itemForm,
         userId: user.id,
-        tags: itemForm.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-        images: ['https://via.placeholder.com/300x200/e0e0e0/757575?text=' + encodeURIComponent(itemForm.title)],
+        tags: itemForm.tags
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter((tag) => tag),
+        images: [
+          'https://via.placeholder.com/300x200/e0e0e0/757575?text=' +
+            encodeURIComponent(itemForm.title),
+        ],
         views: 0,
         likes: [],
         createdAt: new Date().toISOString(),
-        isAvailable: true
+        isAvailable: true,
       };
 
       if (selectedItem) {
         // Update existing item in mock data
-        const updatedItems = dashboardData.items.map(item => 
+        const updatedItems = dashboardData.items.map((item) =>
           item._id === selectedItem._id ? { ...item, ...itemData, _id: selectedItem._id } : item
         );
         setDashboardData({
           ...dashboardData,
-          items: updatedItems
+          items: updatedItems,
         });
         showSnackbar('Item updated successfully!', 'success');
       } else {
         // Add new item to mock data
         const newItem = {
           ...itemData,
-          _id: Date.now().toString() // Simple ID generation
+          _id: Date.now().toString(), // Simple ID generation
         };
         setDashboardData({
           ...dashboardData,
           items: [...dashboardData.items, newItem],
           stats: {
             ...dashboardData.stats,
-            totalItems: dashboardData.items.length + 1
-          }
+            totalItems: dashboardData.items.length + 1,
+          },
         });
         showSnackbar('Item added successfully!', 'success');
       }
-      
+
       setItemDialog(false);
     } catch (error) {
       showSnackbar('Error saving item', 'error');
@@ -359,14 +411,14 @@ const Dashboard = () => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
         // Remove item from mock data
-        const updatedItems = dashboardData.items.filter(item => item._id !== itemId);
+        const updatedItems = dashboardData.items.filter((item) => item._id !== itemId);
         setDashboardData({
           ...dashboardData,
           items: updatedItems,
           stats: {
             ...dashboardData.stats,
-            totalItems: updatedItems.length
-          }
+            totalItems: updatedItems.length,
+          },
         });
         showSnackbar('Item deleted successfully!', 'success');
       } catch (error) {
@@ -386,7 +438,7 @@ const Dashboard = () => {
 
   const handleSwapAction = (swapId, action) => {
     // Update swap status based on action
-    const updatedOngoingSwaps = dashboardData.swaps.ongoing.map(swap => {
+    const updatedOngoingSwaps = dashboardData.swaps.ongoing.map((swap) => {
       if (swap._id === swapId) {
         let newStatus = swap.status;
         if (action === 'accept') {
@@ -406,14 +458,14 @@ const Dashboard = () => {
     let newOngoingSwaps = updatedOngoingSwaps;
 
     if (action === 'complete' || action === 'decline') {
-      const completedSwap = updatedOngoingSwaps.find(swap => swap._id === swapId);
+      const completedSwap = updatedOngoingSwaps.find((swap) => swap._id === swapId);
       if (completedSwap) {
         newCompletedSwaps.push({
           ...completedSwap,
           completedAt: new Date().toISOString(),
-          rating: action === 'complete' ? { requesterRating: 5, ownerRating: 5 } : null
+          rating: action === 'complete' ? { requesterRating: 5, ownerRating: 5 } : null,
         });
-        newOngoingSwaps = updatedOngoingSwaps.filter(swap => swap._id !== swapId);
+        newOngoingSwaps = updatedOngoingSwaps.filter((swap) => swap._id !== swapId);
       }
     }
 
@@ -421,13 +473,13 @@ const Dashboard = () => {
       ...dashboardData,
       swaps: {
         ongoing: newOngoingSwaps,
-        completed: newCompletedSwaps
+        completed: newCompletedSwaps,
       },
       stats: {
         ...dashboardData.stats,
         ongoingSwaps: newOngoingSwaps.length,
-        completedSwaps: newCompletedSwaps.length
-      }
+        completedSwaps: newCompletedSwaps.length,
+      },
     });
 
     setSwapDialog(false);
@@ -436,29 +488,43 @@ const Dashboard = () => {
 
   const getSwapStatusColor = (status) => {
     switch (status) {
-      case 'pending': return 'warning';
-      case 'accepted': return 'info';
-      case 'completed': return 'success';
-      case 'declined': return 'error';
-      case 'cancelled': return 'default';
-      default: return 'default';
+      case 'pending':
+        return 'warning';
+      case 'accepted':
+        return 'info';
+      case 'completed':
+        return 'success';
+      case 'declined':
+        return 'error';
+      case 'cancelled':
+        return 'default';
+      default:
+        return 'default';
     }
   };
 
   const getSwapStatusIcon = (status) => {
     switch (status) {
-      case 'pending': return <Schedule />;
-      case 'accepted': return <CheckCircle />;
-      case 'completed': return <Star />;
-      case 'declined': return <Cancel />;
-      case 'cancelled': return <Cancel />;
-      default: return <SwapHoriz />;
+      case 'pending':
+        return <Schedule />;
+      case 'accepted':
+        return <CheckCircle />;
+      case 'completed':
+        return <Star />;
+      case 'declined':
+        return <Cancel />;
+      case 'cancelled':
+        return <Cancel />;
+      default:
+        return <SwapHoriz />;
     }
   };
 
   if (loading) {
     return (
-      <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Container
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}
+      >
         <CircularProgress />
       </Container>
     );
@@ -477,20 +543,12 @@ const Dashboard = () => {
               <Notifications />
             </IconButton>
           </Badge>
-          <IconButton
-            size="large"
-            onClick={handleMenu}
-            color="inherit"
-          >
+          <IconButton size="large" onClick={handleMenu} color="inherit">
             <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
               {user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </Avatar>
           </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-          >
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
             <MenuItem onClick={handleProfileEdit}>
               <AccountCircle sx={{ mr: 2 }} />
               Edit Profile
@@ -518,47 +576,52 @@ const Dashboard = () => {
               </Avatar>
             </Grid>
             <Grid item xs>
-              <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                {user?.name} 👋
+              <Typography
+                variant="h4"
+                gutterBottom
+                sx={{ fontWeight: 'bold', color: 'primary.main' }}
+              >
+                {user?.name}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                {user?.bio || 'Welcome to your ReWear dashboard! Start exchanging clothes and make a positive impact.'}
+                {user?.bio ||
+                  'Welcome to your ReWear dashboard! Start exchanging clothes and make a positive impact.'}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                <Chip 
-                  icon={<MonetizationOn />} 
-                  label={`${dashboardData?.stats?.totalPoints || 0} Points`} 
-                  color="success" 
+                <Chip
+                  icon={<MonetizationOn />}
+                  label={`${dashboardData?.stats?.totalPoints || 0} Points`}
+                  color="success"
                   variant="outlined"
                 />
-                <Chip 
-                  icon={<Star />} 
-                  label={`${user?.stats?.rating || 5.0} Rating`} 
-                  color="warning" 
+                <Chip
+                  icon={<Star />}
+                  label={`${user?.stats?.rating || 5.0} Rating`}
+                  color="warning"
                   variant="outlined"
                 />
-                <Chip 
-                  icon={<LocationOn />} 
-                  label={user?.location?.city ? `${user.location.city}, ${user.location.state}` : 'Location not set'} 
+                <Chip
+                  icon={<LocationOn />}
+                  label={
+                    user?.location?.city
+                      ? `${user.location.city}, ${user.location.state}`
+                      : 'Location not set'
+                  }
                   variant="outlined"
                 />
               </Box>
             </Grid>
             <Grid item>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button 
-                  variant="outlined" 
-                  startIcon={<Search />} 
+                <Button
+                  variant="outlined"
+                  startIcon={<Search />}
                   onClick={() => navigate('/items')}
                   sx={{ mr: 1 }}
                 >
                   Browse Items
                 </Button>
-                <Button 
-                  variant="contained" 
-                  startIcon={<Edit />} 
-                  onClick={handleProfileEdit}
-                >
+                <Button variant="contained" startIcon={<Edit />} onClick={handleProfileEdit}>
                   Edit Profile
                 </Button>
               </Box>
@@ -631,9 +694,9 @@ const Dashboard = () => {
                 <Typography variant="body2" color="text.secondary">
                   Total Points
                 </Typography>
-                <LinearProgress 
-                  variant="determinate" 
-                  value={(dashboardData?.stats?.totalPoints || 0) / 10} 
+                <LinearProgress
+                  variant="determinate"
+                  value={(dashboardData?.stats?.totalPoints || 0) / 10}
                   sx={{ mt: 1 }}
                 />
               </CardContent>
@@ -693,28 +756,31 @@ const Dashboard = () => {
           {/* My Items Tab */}
           {currentTab === 0 && (
             <Box sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 3,
+                }}
+              >
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                   My Items ({dashboardData?.items?.length || 0})
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                  <Button 
-                    variant="outlined" 
-                    startIcon={<Search />} 
+                  <Button
+                    variant="outlined"
+                    startIcon={<Search />}
                     onClick={() => navigate('/items')}
                   >
                     Browse Items
                   </Button>
-                  <Button 
-                    variant="contained" 
-                    startIcon={<Add />} 
-                    onClick={handleItemAdd}
-                  >
+                  <Button variant="contained" startIcon={<Add />} onClick={handleItemAdd}>
                     Add New Item
                   </Button>
                 </Box>
               </Box>
-              
+
               <Grid container spacing={3}>
                 {dashboardData?.items?.map((item) => (
                   <Grid item xs={12} sm={6} md={4} key={item._id}>
@@ -722,14 +788,18 @@ const Dashboard = () => {
                       <CardMedia
                         component="img"
                         height="200"
-                        image={item.images?.[0] || 'https://via.placeholder.com/300x200/e0e0e0/757575?text=No+Image'}
+                        image={
+                          item.images?.[0] ||
+                          'https://via.placeholder.com/300x200/e0e0e0/757575?text=No+Image'
+                        }
                         alt={item.title}
-                        sx={{ 
+                        sx={{
                           objectFit: 'cover',
-                          backgroundColor: 'grey.100'
+                          backgroundColor: 'grey.100',
                         }}
                         onError={(e) => {
-                          e.target.src = 'https://via.placeholder.com/300x200/e0e0e0/757575?text=No+Image';
+                          e.target.src =
+                            'https://via.placeholder.com/300x200/e0e0e0/757575?text=No+Image';
                         }}
                       />
                       <CardContent>
@@ -744,45 +814,51 @@ const Dashboard = () => {
                           <Chip label={item.size} size="small" />
                           <Chip label={item.condition} size="small" color="secondary" />
                         </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
                           <Typography variant="body2" color="success.main" fontWeight="bold">
                             {item.pointsValue} Points
                           </Typography>
                           <Box sx={{ display: 'flex', gap: 1 }}>
-                            <Chip 
-                              icon={<Visibility />} 
-                              label={item.views || 0} 
-                              size="small" 
-                              variant="outlined" 
+                            <Chip
+                              icon={<Visibility />}
+                              label={item.views || 0}
+                              size="small"
+                              variant="outlined"
                             />
-                            <Chip 
-                              icon={<Favorite />} 
-                              label={item.likes?.length || 0} 
-                              size="small" 
-                              variant="outlined" 
+                            <Chip
+                              icon={<Favorite />}
+                              label={item.likes?.length || 0}
+                              size="small"
+                              variant="outlined"
                             />
                           </Box>
                         </Box>
                       </CardContent>
                       <CardActions>
-                        <Button 
-                          size="small" 
-                          startIcon={<Edit />} 
+                        <Button
+                          size="small"
+                          startIcon={<Edit />}
                           onClick={() => handleItemEdit(item)}
                         >
                           Edit
                         </Button>
-                        <Button 
-                          size="small" 
-                          color="error" 
-                          startIcon={<Delete />} 
+                        <Button
+                          size="small"
+                          color="error"
+                          startIcon={<Delete />}
                           onClick={() => handleItemDelete(item._id)}
                         >
                           Delete
                         </Button>
                         <Box sx={{ ml: 'auto' }}>
-                          <Chip 
-                            label={item.isAvailable ? 'Available' : 'Unavailable'} 
+                          <Chip
+                            label={item.isAvailable ? 'Available' : 'Unavailable'}
                             color={item.isAvailable ? 'success' : 'default'}
                             size="small"
                           />
@@ -792,7 +868,7 @@ const Dashboard = () => {
                   </Grid>
                 ))}
               </Grid>
-              
+
               {(!dashboardData?.items || dashboardData.items.length === 0) && (
                 <Box sx={{ textAlign: 'center', py: 4 }}>
                   <Typography variant="h6" color="text.secondary">
@@ -815,14 +891,14 @@ const Dashboard = () => {
               <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
                 Ongoing Swaps ({dashboardData?.swaps?.ongoing?.length || 0})
               </Typography>
-              
+
               <List>
                 {dashboardData?.swaps?.ongoing?.map((swap) => (
                   <Paper key={swap._id} sx={{ mb: 2, p: 2 }}>
                     <ListItem>
                       <ListItemAvatar>
-                        <Avatar 
-                          src={swap.requesterItemId.images?.[0]} 
+                        <Avatar
+                          src={swap.requesterItemId.images?.[0]}
                           sx={{ width: 56, height: 56 }}
                         >
                           <Checkroom />
@@ -842,9 +918,7 @@ const Dashboard = () => {
                         }
                         secondary={
                           <Box sx={{ mt: 1 }}>
-                            <Typography variant="body2">
-                              With: {swap.requesterId.name}
-                            </Typography>
+                            <Typography variant="body2">With: {swap.requesterId.name}</Typography>
                             <Typography variant="body2" color="text.secondary">
                               {new Date(swap.createdAt).toLocaleDateString()}
                             </Typography>
@@ -852,14 +926,25 @@ const Dashboard = () => {
                         }
                       />
                       <ListItemSecondaryAction>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'end', gap: 1 }}>
-                          <Chip 
-                            label={swap.status} 
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'end',
+                            gap: 1,
+                          }}
+                        >
+                          <Chip
+                            label={swap.status}
                             color={getSwapStatusColor(swap.status)}
                             size="small"
                             icon={getSwapStatusIcon(swap.status)}
                           />
-                          <Button size="small" variant="outlined" onClick={() => handleSwapView(swap)}>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() => handleSwapView(swap)}
+                          >
                             View Details
                           </Button>
                         </Box>
@@ -868,7 +953,7 @@ const Dashboard = () => {
                   </Paper>
                 ))}
               </List>
-              
+
               {(!dashboardData?.swaps?.ongoing || dashboardData.swaps.ongoing.length === 0) && (
                 <Box sx={{ textAlign: 'center', py: 4 }}>
                   <Typography variant="h6" color="text.secondary">
@@ -888,14 +973,14 @@ const Dashboard = () => {
               <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
                 Completed Swaps ({dashboardData?.swaps?.completed?.length || 0})
               </Typography>
-              
+
               <List>
                 {dashboardData?.swaps?.completed?.map((swap) => (
                   <Paper key={swap._id} sx={{ mb: 2, p: 2 }}>
                     <ListItem>
                       <ListItemAvatar>
-                        <Avatar 
-                          src={swap.requesterItemId.images?.[0]} 
+                        <Avatar
+                          src={swap.requesterItemId.images?.[0]}
                           sx={{ width: 56, height: 56 }}
                         >
                           <Checkroom />
@@ -915,9 +1000,7 @@ const Dashboard = () => {
                         }
                         secondary={
                           <Box sx={{ mt: 1 }}>
-                            <Typography variant="body2">
-                              With: {swap.ownerId.name}
-                            </Typography>
+                            <Typography variant="body2">With: {swap.ownerId.name}</Typography>
                             <Typography variant="body2" color="text.secondary">
                               Completed: {new Date(swap.completedAt).toLocaleDateString()}
                             </Typography>
@@ -926,12 +1009,15 @@ const Dashboard = () => {
                                 <Typography variant="body2">Rating:</Typography>
                                 <Box sx={{ display: 'flex' }}>
                                   {[...Array(5)].map((_, i) => (
-                                    <Star 
-                                      key={i} 
-                                      sx={{ 
-                                        color: i < (swap.rating.requesterRating || 0) ? 'warning.main' : 'grey.300',
-                                        fontSize: 16
-                                      }} 
+                                    <Star
+                                      key={i}
+                                      sx={{
+                                        color:
+                                          i < (swap.rating.requesterRating || 0)
+                                            ? 'warning.main'
+                                            : 'grey.300',
+                                        fontSize: 16,
+                                      }}
                                     />
                                   ))}
                                 </Box>
@@ -941,14 +1027,25 @@ const Dashboard = () => {
                         }
                       />
                       <ListItemSecondaryAction>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'end', gap: 1 }}>
-                          <Chip 
-                            label="Completed" 
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'end',
+                            gap: 1,
+                          }}
+                        >
+                          <Chip
+                            label="Completed"
                             color="success"
                             size="small"
                             icon={<CheckCircle />}
                           />
-                          <Button size="small" variant="outlined" onClick={() => handleSwapView(swap)}>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() => handleSwapView(swap)}
+                          >
                             View Details
                           </Button>
                         </Box>
@@ -957,7 +1054,7 @@ const Dashboard = () => {
                   </Paper>
                 ))}
               </List>
-              
+
               {(!dashboardData?.swaps?.completed || dashboardData.swaps.completed.length === 0) && (
                 <Box sx={{ textAlign: 'center', py: 4 }}>
                   <Typography variant="h6" color="text.secondary">
@@ -993,7 +1090,7 @@ const Dashboard = () => {
                 fullWidth
                 label="Name"
                 value={profileForm.name}
-                onChange={(e) => setProfileForm({...profileForm, name: e.target.value})}
+                onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
               />
             </Grid>
             <Grid item xs={12}>
@@ -1003,7 +1100,7 @@ const Dashboard = () => {
                 multiline
                 rows={3}
                 value={profileForm.bio}
-                onChange={(e) => setProfileForm({...profileForm, bio: e.target.value})}
+                onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
               />
             </Grid>
             <Grid item xs={6}>
@@ -1011,10 +1108,12 @@ const Dashboard = () => {
                 fullWidth
                 label="City"
                 value={profileForm.location.city}
-                onChange={(e) => setProfileForm({
-                  ...profileForm, 
-                  location: {...profileForm.location, city: e.target.value}
-                })}
+                onChange={(e) =>
+                  setProfileForm({
+                    ...profileForm,
+                    location: { ...profileForm.location, city: e.target.value },
+                  })
+                }
               />
             </Grid>
             <Grid item xs={6}>
@@ -1022,17 +1121,21 @@ const Dashboard = () => {
                 fullWidth
                 label="State"
                 value={profileForm.location.state}
-                onChange={(e) => setProfileForm({
-                  ...profileForm, 
-                  location: {...profileForm.location, state: e.target.value}
-                })}
+                onChange={(e) =>
+                  setProfileForm({
+                    ...profileForm,
+                    location: { ...profileForm.location, state: e.target.value },
+                  })
+                }
               />
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setProfileDialog(false)}>Cancel</Button>
-          <Button onClick={handleProfileSave} variant="contained">Save</Button>
+          <Button onClick={handleProfileSave} variant="contained">
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -1046,7 +1149,7 @@ const Dashboard = () => {
                 fullWidth
                 label="Title"
                 value={itemForm.title}
-                onChange={(e) => setItemForm({...itemForm, title: e.target.value})}
+                onChange={(e) => setItemForm({ ...itemForm, title: e.target.value })}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -1054,7 +1157,7 @@ const Dashboard = () => {
                 fullWidth
                 label="Brand"
                 value={itemForm.brand}
-                onChange={(e) => setItemForm({...itemForm, brand: e.target.value})}
+                onChange={(e) => setItemForm({ ...itemForm, brand: e.target.value })}
               />
             </Grid>
             <Grid item xs={12}>
@@ -1064,7 +1167,7 @@ const Dashboard = () => {
                 multiline
                 rows={3}
                 value={itemForm.description}
-                onChange={(e) => setItemForm({...itemForm, description: e.target.value})}
+                onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
@@ -1072,10 +1175,12 @@ const Dashboard = () => {
                 <InputLabel>Category</InputLabel>
                 <Select
                   value={itemForm.category}
-                  onChange={(e) => setItemForm({...itemForm, category: e.target.value})}
+                  onChange={(e) => setItemForm({ ...itemForm, category: e.target.value })}
                 >
-                  {categories.map(cat => (
-                    <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                  {categories.map((cat) => (
+                    <MenuItem key={cat} value={cat}>
+                      {cat}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -1085,10 +1190,12 @@ const Dashboard = () => {
                 <InputLabel>Size</InputLabel>
                 <Select
                   value={itemForm.size}
-                  onChange={(e) => setItemForm({...itemForm, size: e.target.value})}
+                  onChange={(e) => setItemForm({ ...itemForm, size: e.target.value })}
                 >
-                  {sizes.map(size => (
-                    <MenuItem key={size} value={size}>{size}</MenuItem>
+                  {sizes.map((size) => (
+                    <MenuItem key={size} value={size}>
+                      {size}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -1098,10 +1205,12 @@ const Dashboard = () => {
                 <InputLabel>Condition</InputLabel>
                 <Select
                   value={itemForm.condition}
-                  onChange={(e) => setItemForm({...itemForm, condition: e.target.value})}
+                  onChange={(e) => setItemForm({ ...itemForm, condition: e.target.value })}
                 >
-                  {conditions.map(cond => (
-                    <MenuItem key={cond} value={cond}>{cond}</MenuItem>
+                  {conditions.map((cond) => (
+                    <MenuItem key={cond} value={cond}>
+                      {cond}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -1111,7 +1220,7 @@ const Dashboard = () => {
                 fullWidth
                 label="Color"
                 value={itemForm.color}
-                onChange={(e) => setItemForm({...itemForm, color: e.target.value})}
+                onChange={(e) => setItemForm({ ...itemForm, color: e.target.value })}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -1120,7 +1229,9 @@ const Dashboard = () => {
                 label="Points Value"
                 type="number"
                 value={itemForm.pointsValue}
-                onChange={(e) => setItemForm({...itemForm, pointsValue: parseInt(e.target.value)})}
+                onChange={(e) =>
+                  setItemForm({ ...itemForm, pointsValue: parseInt(e.target.value) })
+                }
                 inputProps={{ min: 1, max: 100 }}
               />
             </Grid>
@@ -1129,7 +1240,7 @@ const Dashboard = () => {
                 fullWidth
                 label="Tags (comma-separated)"
                 value={itemForm.tags}
-                onChange={(e) => setItemForm({...itemForm, tags: e.target.value})}
+                onChange={(e) => setItemForm({ ...itemForm, tags: e.target.value })}
                 placeholder="vintage, summer, casual"
               />
             </Grid>
@@ -1147,11 +1258,11 @@ const Dashboard = () => {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
-        onClose={() => setSnackbar({...snackbar, open: false})}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
-        <Alert 
-          severity={snackbar.severity} 
-          onClose={() => setSnackbar({...snackbar, open: false})}
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
         >
           {snackbar.message}
         </Alert>
@@ -1172,8 +1283,8 @@ const Dashboard = () => {
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, backgroundColor: 'grey.50' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Chip 
-                      label={selectedSwap.status} 
+                    <Chip
+                      label={selectedSwap.status}
                       color={getSwapStatusColor(selectedSwap.status)}
                       icon={getSwapStatusIcon(selectedSwap.status)}
                     />
@@ -1182,13 +1293,9 @@ const Dashboard = () => {
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Typography variant="h6">
-                      {selectedSwap.requesterItemId.title}
-                    </Typography>
+                    <Typography variant="h6">{selectedSwap.requesterItemId.title}</Typography>
                     <SwapHoriz />
-                    <Typography variant="h6">
-                      {selectedSwap.ownerItemId.title}
-                    </Typography>
+                    <Typography variant="h6">{selectedSwap.ownerItemId.title}</Typography>
                   </Box>
                 </Paper>
               </Grid>
@@ -1202,7 +1309,10 @@ const Dashboard = () => {
                   <CardMedia
                     component="img"
                     height="200"
-                    image={selectedSwap.requesterItemId.images?.[0] || 'https://via.placeholder.com/300x200/e0e0e0/757575?text=No+Image'}
+                    image={
+                      selectedSwap.requesterItemId.images?.[0] ||
+                      'https://via.placeholder.com/300x200/e0e0e0/757575?text=No+Image'
+                    }
                     alt={selectedSwap.requesterItemId.title}
                   />
                   <CardContent>
@@ -1225,7 +1335,10 @@ const Dashboard = () => {
                   <CardMedia
                     component="img"
                     height="200"
-                    image={selectedSwap.ownerItemId.images?.[0] || 'https://via.placeholder.com/300x200/e0e0e0/757575?text=No+Image'}
+                    image={
+                      selectedSwap.ownerItemId.images?.[0] ||
+                      'https://via.placeholder.com/300x200/e0e0e0/757575?text=No+Image'
+                    }
                     alt={selectedSwap.ownerItemId.title}
                   />
                   <CardContent>
@@ -1314,12 +1427,15 @@ const Dashboard = () => {
                     <Typography variant="body2">Your Rating:</Typography>
                     <Box sx={{ display: 'flex' }}>
                       {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i} 
-                          sx={{ 
-                            color: i < (selectedSwap.rating?.requesterRating || 0) ? 'warning.main' : 'grey.300',
-                            fontSize: 20
-                          }} 
+                        <Star
+                          key={i}
+                          sx={{
+                            color:
+                              i < (selectedSwap.rating?.requesterRating || 0)
+                                ? 'warning.main'
+                                : 'grey.300',
+                            fontSize: 20,
+                          }}
                         />
                       ))}
                     </Box>
